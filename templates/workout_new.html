@@ -1,58 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}New Workout · LiftLog{% endblock %}
+{% block title %}New Workout · FitFlow{% endblock %}
 
 {% block content %}
-  <section class="page-head">
-    <div class="page-head__left">
-      <h1 class="page-title">New Workout</h1>
-      <p class="page-subtitle">Log sets quickly.</p>
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">New Workout</h1>
+    <p class="page-subtitle">Log a workout quickly.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="form" method="POST" action="/workouts/new" autocomplete="off">
+    <label class="label" for="date">Date</label>
+    <input class="input" id="date" name="date" type="date" required />
+
+    <label class="label" for="exercise">Exercise</label>
+    <input class="input" id="exercise" name="exercise" type="text" placeholder="e.g., Bench Press" required />
+
+    <label class="label" for="sets">Sets</label>
+    <input class="input" id="sets" name="sets" type="number" min="1" required />
+
+    <label class="label" for="reps">Reps</label>
+    <input class="input" id="reps" name="reps" type="number" min="1" required />
+
+    <label class="label" for="weight">Weight</label>
+    <input class="input" id="weight" name="weight" type="number" step="0.5" min="0" required />
+
+    <label class="label" for="notes">Notes (optional)</label>
+    <input class="input" id="notes" name="notes" type="text" placeholder="e.g., felt strong today" />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/workouts">Cancel</a>
+      <button class="btn btn--primary" type="submit">Save</button>
     </div>
-  </section>
-
-  <section class="card">
-    <form id="workout-form" class="form" autocomplete="off">
-      <label class="label" for="date">Date</label>
-      <input class="input" id="date" name="date" type="date" required />
-
-      <label class="label" for="exercise">Exercise</label>
-      <input
-        class="input"
-        id="exercise"
-        name="exercise"
-        type="text"
-        placeholder="e.g., Bench Press"
-        required
-      />
-
-      <label class="label" for="notes">Notes</label>
-      <input
-        class="input"
-        id="notes"
-        name="notes"
-        type="text"
-        placeholder="e.g., felt strong today"
-      />
-
-      <div class="divider"></div>
-
-      <div class="form-row">
-        <h2 class="section-title">Sets</h2>
-        <button id="add-set" class="btn btn--ghost" type="button">+ Add set</button>
-      </div>
-
-      <div id="sets-container" class="sets"></div>
-
-      <div class="form-actions">
-        <a class="btn btn--ghost" href="/workouts">Cancel</a>
-        <button class="btn btn--primary" type="submit">Save workout</button>
-      </div>
-
-      <div id="form-message" class="form-message" aria-live="polite"></div>
-    </form>
-  </section>
+  </form>
+</section>
 {% endblock %}
 
-{% block scripts %}
-  <script src="{{ url_for('static', filename='javascript/workout_new.js') }}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}
