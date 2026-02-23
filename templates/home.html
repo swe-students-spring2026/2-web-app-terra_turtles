@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Home · LiftLog{% endblock %}
+{% block title %}Home · FitFlow{% endblock %}
 
 {% block content %}
   <section class="hero">
     <div class="hero__bg"></div>
     <div class="hero__content">
       <h1 class="hero__title">Make progress measurable.</h1>
-      <p class="hero__subtitle">
-        Track workouts + nutrition with clean data.
-      </p>
+      <p class="hero__subtitle">Track workouts + nutrition with clean data.</p>
 
       <div class="hero__actions">
-        <a class="btn btn--primary" href="/workouts/new">+ Log Workout</a>
-        <a class="btn btn--secondary" href="/diet/new">+ Log Meal</a>
+        {% if session.get("user_id") %}
+          <a class="btn btn--primary" href="/workouts/new">+ Log Workout</a>
+          <a class="btn btn--secondary" href="/diet/new">+ Log Meal</a>
+        {% else %}
+          <a class="btn btn--primary" href="/login">Login to start</a>
+          <a class="btn btn--secondary" href="/register">Create account</a>
+        {% endif %}
       </div>
     </div>
   </section>
 
   <section class="grid">
-
     <!-- Today summary -->
     <article class="card">
       <div class="card__header">
@@ -30,15 +32,15 @@
       <div class="stats">
         <div class="stat">
           <div class="stat__label">Workouts</div>
-          <div class="stat__value" id="stat-workouts">0</div>
+          <div class="stat__value">{{ today_workouts or 0 }}</div>
         </div>
         <div class="stat">
           <div class="stat__label">Calories</div>
-          <div class="stat__value" id="stat-calories">0</div>
+          <div class="stat__value">{{ today_calories or 0 }}</div>
         </div>
         <div class="stat">
           <div class="stat__label">Protein (g)</div>
-          <div class="stat__value" id="stat-protein">0</div>
+          <div class="stat__value">{{ today_protein or 0 }}</div>
         </div>
       </div>
 
@@ -51,12 +53,28 @@
     <!-- Recent workout -->
     <article class="card">
       <div class="card__header">
-        <h2 class="card__title">Recent Workout</h2>
-        <span class="chip chip--ghost">Last 7 days</span>
+        <h2 class="card__title">Recent Workouts</h2>
+        <span class="chip chip--ghost">Last 7 entries</span>
       </div>
 
-      <div class="list" id="recent-workout-list">
-        <div class="list__empty">No workouts yet. Log your first set.</div>
+      <div class="list">
+        {% if recent_workouts and recent_workouts|length > 0 %}
+          {% for w in recent_workouts %}
+            <a class="list__row" href="/workouts" style="text-decoration:none; color:inherit;">
+              <div class="list__main">
+                <div class="list__title">{{ w.exercise }}</div>
+                <div class="list__meta">
+                  <span>{{ w.date or "" }}</span>
+                  <span> · </span>
+                  <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
+                </div>
+              </div>
+              <div class="list__right">›</div>
+            </a>
+          {% endfor %}
+        {% else %}
+          <div class="list__empty">No workouts yet. Log your first set.</div>
+        {% endif %}
       </div>
 
       <div class="card__footer">
@@ -72,7 +90,7 @@
       </div>
 
       <div class="tool-row">
-        <a class="tool" href="/workouts?view=search">
+        <a class="tool" href="/workouts/search">
           <div class="tool__icon">🔎</div>
           <div class="tool__text">
             <div class="tool__title">Search lifts</div>
@@ -80,11 +98,11 @@
           </div>
         </a>
 
-        <a class="tool" href="/workouts/templates">
-          <div class="tool__icon">🧩</div>
+        <a class="tool" href="/workouts/new">
+          <div class="tool__icon">➕</div>
           <div class="tool__text">
-            <div class="tool__title">Templates</div>
-            <div class="tool__desc">Build your Push/Pull/Legs</div>
+            <div class="tool__title">Log a set</div>
+            <div class="tool__desc">Quickly add a workout entry</div>
           </div>
         </a>
       </div>
@@ -92,39 +110,4 @@
   </section>
 {% endblock %}
 
-{% block scripts %}
-  <script>
-    // use placeholder data.；will be changed fetch('/api/...') in the future
-    const mock = {
-      today: { workouts: 1, calories: 2150, protein: 145 },
-      recent: [
-        { date: "2026-02-19", name: "Bench Press", topSet: "8 reps @ 135" },
-        { date: "2026-02-18", name: "Pull-up", topSet: "6 reps @ BW" },
-      ]
-    };
-
-    document.getElementById("stat-workouts").textContent = mock.today.workouts;
-    document.getElementById("stat-calories").textContent = mock.today.calories;
-    document.getElementById("stat-protein").textContent = mock.today.protein;
-
-    const list = document.getElementById("recent-workout-list");
-    list.innerHTML = "";
-    if (!mock.recent.length) {
-      list.innerHTML = `<div class="list__empty">No workouts yet. Log your first set.</div>`;
-    } else {
-      mock.recent.forEach(item => {
-        const row = document.createElement("div");
-        row.className = "list__row";
-        row.innerHTML = `
-          <div class="list__left">
-            <div class="list__title">${item.name}</div>
-            <div class="list__meta">${item.date} · ${item.topSet}</div>
-          </div>
-          <div class="list__right">›</div>
-        `;
-        row.addEventListener("click", () => { window.location.href = "/workouts"; });
-        list.appendChild(row);
-      });
-    }
-  </script>
-{% endblock %}
+{% block scripts %}{% endblock %}

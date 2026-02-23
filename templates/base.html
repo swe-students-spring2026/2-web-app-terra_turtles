@@ -47,18 +47,19 @@
       <span class="bottom-nav__label">Timer</span>
     </a>
 
-    <!-- This becomes Login or Logout depending on session -->
-    <a class="bottom-nav__item" id="auth-nav" href="/login" aria-label="Login">
-      <span class="bottom-nav__icon" id="auth-nav-icon">👤</span>
-      <span class="bottom-nav__label" id="auth-nav-label">Login</span>
-    </a>
+    {% if session.get("user_id") %}
+      <a class="bottom-nav__item" href="/logout" aria-label="Logout">
+        <span class="bottom-nav__icon">🚪</span>
+        <span class="bottom-nav__label">Logout</span>
+      </a>
+    {% else %}
+      <a class="bottom-nav__item" href="/login" aria-label="Login">
+        <span class="bottom-nav__icon">👤</span>
+        <span class="bottom-nav__label">Login</span>
+      </a>
+    {% endif %}
   </nav>
-
-  <!-- Global scripts -->
-  <script src="{{ url_for('static', filename='javascript/api.js') }}"></script>
-  <script src="{{ url_for('static', filename='javascript/auth.js') }}"></script>
-  <script src="{{ url_for('static', filename='javascript/main.js') }}"></script>
-
+  
   {% block scripts %}{% endblock %}
 </body>
 </html>

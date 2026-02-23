@@ -1,29 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Delete Workout · LiftLog{% endblock %}
+{% block title %}Delete Workout · FitFlow{% endblock %}
 
 {% block content %}
-  <section class="page-head">
-    <div class="page-head__left">
-      <h1 class="page-title">Delete Workout</h1>
-      <p class="page-subtitle">This action cannot be undone.</p>
-    </div>
-  </section>
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Delete Workout</h1>
+    <p class="page-subtitle">This action cannot be undone.</p>
+  </div>
+</section>
 
-  <section class="card">
-    <div id="delete-info" class="danger-box">
-      <div class="list__empty">Loading workout...</div>
-    </div>
+<section class="card">
+  <div class="danger-box">
+    <p><strong>{{ workout.exercise }}</strong></p>
+    <p>{{ workout.date or "" }}</p>
+    <p>{{ workout.sets }} sets × {{ workout.reps }} reps @ {{ workout.weight }}</p>
+    {% if workout.notes %}<p>{{ workout.notes }}</p>{% endif %}
+  </div>
 
-    <div class="form-actions" style="margin-top:12px;">
-      <a class="btn btn--ghost" href="/workouts">Cancel</a>
-      <button id="confirm-delete" class="btn btn--primary" type="button">Delete</button>
-    </div>
-
-    <div id="delete-message" class="form-message" aria-live="polite"></div>
-  </section>
+  <form method="POST" action="/workouts/{{ workout._id }}/delete" class="form-actions" style="margin-top:12px;">
+    <a class="btn btn--ghost" href="/workouts">Cancel</a>
+    <button class="btn btn--primary" type="submit">Delete</button>
+  </form>
+</section>
 {% endblock %}
 
-{% block scripts %}
-  <script src="{{ url_for('static', filename='javascript/workout_delete.js') }}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}

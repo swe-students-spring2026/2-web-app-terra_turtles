@@ -1,49 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}Workouts · LiftLog{% endblock %}
+{% block title %}Workouts · FitFlow{% endblock %}
 
 {% block content %}
-  <section class="page-head">
-    <div class="page-head__left">
-      <h1 class="page-title">Workouts</h1>
-      <p class="page-subtitle">Search history and track progressive overload.</p>
-    </div>
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Workouts</h1>
+    <p class="page-subtitle">Search history and track progressive overload.</p>
+  </div>
+  <div class="page-head__right">
+    <a class="btn btn--primary" href="/workouts/new">+ Add</a>
+  </div>
+</section>
 
-    <div class="page-head__right">
-      <a class="btn btn--primary" href="/workouts/new">+ Add</a>
-    </div>
-  </section>
+<section class="card">
+  <form class="searchbar" method="GET" action="/workouts/search">
+    <input
+      class="input"
+      type="search"
+      name="q"
+      placeholder="Search by exercise..."
+      value="{{ q or '' }}"
+      autocomplete="off"
+    />
+    <button class="btn btn--ghost" type="submit">Search</button>
+    <a class="btn btn--ghost" href="/workouts">Clear</a>
+  </form>
 
-  <section class="card">
-    <div class="searchbar">
-      <input
-        id="workout-search"
-        class="input"
-        type="search"
-        placeholder="Search by exercise, date, or notes..."
-        autocomplete="off"
-      />
-      <button id="workout-clear" class="btn btn--ghost" type="button">Clear</button>
-    </div>
+  <div class="list" aria-live="polite">
+    {% if workouts and workouts|length > 0 %}
+      {% for w in workouts %}
+        <div class="list__row">
+          <div class="list__main">
+            <div class="list__title">{{ w.exercise }}</div>
+            <div class="list__meta">
+              <span>{{ w.date or "" }}</span>
+              <span> · </span>
+              <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
+              {% if w.notes %}<span> · </span><span>{{ w.notes }}</span>{% endif %}
+            </div>
+          </div>
 
-    <div class="list" id="workout-list" aria-live="polite">
-      <div class="list__empty">Loading workouts...</div>
-    </div>
-  </section>
-
-  <section class="card">
-    <div class="card__header">
-      <h2 class="card__title">Tips</h2>
-      <span class="chip chip--ghost">Quick</span>
-    </div>
-    <ul class="bullets">
-      <li>Use the search box to find an exercise (e.g., “bench”).</li>
-      <li>Click a workout to open details (optional page).</li>
-      <li>Edit or delete using the buttons on the right.</li>
-    </ul>
-  </section>
+          <div class="list__actions">
+            <a class="btn btn--ghost" href="/workouts/{{ w._id }}/edit">Edit</a>
+            <a class="btn btn--ghost" href="/workouts/{{ w._id }}/delete">Delete</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="list__empty">No workouts found.</div>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}
 
-{% block scripts %}
-  <script src="{{ url_for('static', filename='javascript/workouts.js') }}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}

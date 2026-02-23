@@ -1,34 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Login · LiftLog{% endblock %}
+{% block title %}Login · FitFlow{% endblock %}
 
 {% block content %}
-  <section class="page-head">
-    <div class="page-head__left">
-      <h1 class="page-title">Login</h1>
-      <p class="page-subtitle">Access your workouts and diet logs.</p>
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Login</h1>
+    <p class="page-subtitle">Access your workouts and diet logs.</p>
+  </div>
+</section>
+
+<section class="card">
+  {% if error %}
+    <div class="form-message">{{ error }}</div>
+  {% endif %}
+
+  <form class="form" method="POST" action="/login" autocomplete="off">
+    <label class="label" for="email">Email</label>
+    <input class="input" id="email" name="email" type="email" placeholder="you@example.com" required />
+
+    <label class="label" for="password">Password</label>
+    <input class="input" id="password" name="password" type="password" placeholder="••••••••" required />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/register">Create account</a>
+      <button class="btn btn--primary" type="submit">Login</button>
     </div>
-  </section>
-
-  <section class="card">
-    <form id="login-form" class="form" autocomplete="off">
-      <label class="label" for="email">Email</label>
-      <input class="input" id="email" type="email" placeholder="you@example.com" required />
-
-      <label class="label" for="password">Password</label>
-      <input class="input" id="password" type="password" placeholder="••••••••" required />
-
-      <div class="form-actions">
-        <a class="btn btn--ghost" href="/register">Create account</a>
-        <button class="btn btn--primary" type="submit">Login</button>
-      </div>
-
-      <div id="login-message" class="form-message" aria-live="polite"></div>
-    </form>
-  </section>
+  </form>
+</section>
 {% endblock %}
 
-{% block scripts %}
-  <script src="{{ url_for('static', filename='javascript/auth.js') }}"></script>
-  <script src="{{ url_for('static', filename='javascript/login.js') }}"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}
