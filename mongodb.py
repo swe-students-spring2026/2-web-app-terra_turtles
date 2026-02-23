@@ -1,9 +1,6 @@
-from itsdangerous import NoneAlgorithm
 import pymongo
 from bson.objectid import ObjectId
 import datetime
-
-import pymongo.server_api
 
 user_id = input("Enter your mongodb user id: ")
 password = input("Enter your mongodb password: ")
@@ -189,7 +186,6 @@ def getIDsMeals(name, email, meal, calories, protein, date):
     for doc in docs:
         ids.append(doc["_id"])
     return ids
-
 
 
 
