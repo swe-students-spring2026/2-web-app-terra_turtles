@@ -14,7 +14,7 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret")  # local dev fallback
 
 # Mongo connection (created once at startup)
 mongo_uri = os.getenv("MONGO_URI")
-db_name = os.getenv("MONGO_DBNAME", "Gym_info")
+db_name = os.getenv("MONGO_DBNAME", "gym_info")
 if not mongo_uri:
     raise RuntimeError("MONGO_URI is not set in .env")
 
@@ -22,7 +22,7 @@ client = MongoClient(mongo_uri)
 db = client[db_name]
 
 
-# --- small helpers ---
+# small helpers
 def to_int(v, default=0):
     try:
         return int(v)
@@ -52,13 +52,13 @@ def current_user_id():
     return session.get("user_id")
 
 
-# --- home ---
+# home 
 @app.get("/")
 def home():
     return render_template("home.html")
 
 
-# --- auth ---
+# auth
 @app.get("/register")
 def register():
     return render_template("register.html")
@@ -119,7 +119,7 @@ def logout():
     return redirect(url_for("home"))
 
 
-# --- workouts (collection: sets) ---
+# workouts (collection: sets)
 @app.get("/workouts")
 def workouts():
     if not require_login():
@@ -239,7 +239,7 @@ def workout_delete_post(id):
     return redirect(url_for("workouts"))
 
 
-# --- diet (collection: meals) ---
+# diet (collection: meals)
 def meal_totals(meals):
     return {
         "calories": sum(to_int(m.get("calories")) for m in meals),
@@ -336,7 +336,7 @@ def diet_delete_post(id):
     return redirect(url_for("diet"))
 
 
-# --- timer ---
+# timer
 @app.get("/timer")
 def timer():
     return render_template("timer.html")
