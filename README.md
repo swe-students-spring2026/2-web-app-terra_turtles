@@ -98,7 +98,7 @@ MONGO_URI="mongodb+srv://USERNAME:YOUR_PASSWORD@terraturtles.rufwskm.mongodb.net
 MONGO_DBNAME="gym_info"
 
 # Flask session key
-SECRET_KEY="YOUR PASSWORD"
+SECRET_KEY="YOUR_PASSWORD"
 ```
 
 
