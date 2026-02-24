@@ -3,111 +3,111 @@
 {% block title %}Home · FitFlow{% endblock %}
 
 {% block content %}
-  <section class="hero">
-    <div class="hero__bg"></div>
-    <div class="hero__content">
-      <h1 class="hero__title">Make progress measurable.</h1>
-      <p class="hero__subtitle">Track workouts + nutrition with clean data.</p>
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__content">
+    <h1 class="hero__title">Make progress measurable.</h1>
+    <p class="hero__subtitle">Track workouts + nutrition with clean data.</p>
 
-      <div class="hero__actions">
-        {% if session.get("user_id") %}
-          <a class="btn btn--primary" href="/workouts/new">+ Log Workout</a>
-          <a class="btn btn--secondary" href="/diet/new">+ Log Meal</a>
-        {% else %}
-          <a class="btn btn--primary" href="/login">Login to start</a>
-          <a class="btn btn--secondary" href="/register">Create account</a>
-        {% endif %}
+    <div class="hero__actions">
+      {% if session.get("user_id") %}
+        <a class="btn btn--primary" href="/workouts/new">+ Log Workout</a>
+        <a class="btn btn--secondary" href="/diet/new">+ Log Meal</a>
+      {% else %}
+        <a class="btn btn--primary" href="/login">Login to start</a>
+        <a class="btn btn--secondary" href="/register">Create account</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="grid">
+  <!-- Today overview -->
+  <article class="card">
+    <div class="card__header">
+      <h2 class="card__title">Today</h2>
+      <span class="chip">Live</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat__label">Workouts</div>
+        <div class="stat__value">{{ today_workouts or 0 }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Calories</div>
+        <div class="stat__value">{{ today_calories or 0 }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Protein (g)</div>
+        <div class="stat__value">{{ today_protein or 0 }}</div>
       </div>
     </div>
-  </section>
 
-  <section class="grid">
-    <!-- Today summary -->
-    <article class="card">
-      <div class="card__header">
-        <h2 class="card__title">Today</h2>
-        <span class="chip">Live</span>
-      </div>
+    <div class="card__footer">
+      <a class="link" href="/diet">View diet →</a>
+      <a class="link" href="/workouts">View workouts →</a>
+    </div>
+  </article>
 
-      <div class="stats">
-        <div class="stat">
-          <div class="stat__label">Workouts</div>
-          <div class="stat__value">{{ today_workouts or 0 }}</div>
-        </div>
-        <div class="stat">
-          <div class="stat__label">Calories</div>
-          <div class="stat__value">{{ today_calories or 0 }}</div>
-        </div>
-        <div class="stat">
-          <div class="stat__label">Protein (g)</div>
-          <div class="stat__value">{{ today_protein or 0 }}</div>
-        </div>
-      </div>
+  <!-- Recent workouts -->
+  <article class="card">
+    <div class="card__header">
+      <h2 class="card__title">Recent Workouts</h2>
+      <span class="chip chip--ghost">Last 7 entries</span>
+    </div>
 
-      <div class="card__footer">
-        <a class="link" href="/diet">View diet →</a>
-        <a class="link" href="/workouts">View workouts →</a>
-      </div>
-    </article>
-
-    <!-- Recent workout -->
-    <article class="card">
-      <div class="card__header">
-        <h2 class="card__title">Recent Workouts</h2>
-        <span class="chip chip--ghost">Last 7 entries</span>
-      </div>
-
-      <div class="list">
-        {% if recent_workouts and recent_workouts|length > 0 %}
-          {% for w in recent_workouts %}
-            <a class="list__row" href="/workouts" style="text-decoration:none; color:inherit;">
-              <div class="list__main">
-                <div class="list__title">{{ w.exercise }}</div>
-                <div class="list__meta">
-                  <span>{{ w.date or "" }}</span>
-                  <span> · </span>
-                  <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
-                </div>
+    <div class="list">
+      {% if recent_workouts %}
+        {% for w in recent_workouts %}
+          <a class="list__row" href="/workouts" style="text-decoration:none; color:inherit;">
+            <div class="list__main">
+              <div class="list__title">{{ w.exercise }}</div>
+              <div class="list__meta">
+                <span>{{ w.date or "" }}</span>
+                <span> · </span>
+                <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
               </div>
-              <div class="list__right">›</div>
-            </a>
-          {% endfor %}
-        {% else %}
-          <div class="list__empty">No workouts yet. Log your first set.</div>
-        {% endif %}
-      </div>
+            </div>
+            <div class="list__right">›</div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="list__empty">No workouts yet. Log your first set.</div>
+      {% endif %}
+    </div>
 
-      <div class="card__footer">
-        <a class="btn btn--ghost" href="/workouts">Open workouts</a>
-        <a class="btn btn--ghost" href="/timer">Rest timer</a>
-      </div>
-    </article>
+    <div class="card__footer">
+      <a class="btn btn--ghost" href="/workouts">Open workouts</a>
+      <a class="btn btn--ghost" href="/timer">Rest timer</a>
+    </div>
+  </article>
 
-    <!-- Quick tools -->
-    <article class="card">
-      <div class="card__header">
-        <h2 class="card__title">Quick Tools</h2>
-      </div>
+  <!-- Shortcuts -->
+  <article class="card">
+    <div class="card__header">
+      <h2 class="card__title">Quick Tools</h2>
+    </div>
 
-      <div class="tool-row">
-        <a class="tool" href="/workouts/search">
-          <div class="tool__icon">🔎</div>
-          <div class="tool__text">
-            <div class="tool__title">Search lifts</div>
-            <div class="tool__desc">Find exercise history fast</div>
-          </div>
-        </a>
+    <div class="tool-row">
+      <a class="tool" href="/workouts/search">
+        <div class="tool__icon">🔎</div>
+        <div class="tool__text">
+          <div class="tool__title">Search lifts</div>
+          <div class="tool__desc">Find exercise history fast</div>
+        </div>
+      </a>
 
-        <a class="tool" href="/workouts/new">
-          <div class="tool__icon">➕</div>
-          <div class="tool__text">
-            <div class="tool__title">Log a set</div>
-            <div class="tool__desc">Quickly add a workout entry</div>
-          </div>
-        </a>
-      </div>
-    </article>
-  </section>
+      <a class="tool" href="/workouts/new">
+        <div class="tool__icon">➕</div>
+        <div class="tool__text">
+          <div class="tool__title">Log a set</div>
+          <div class="tool__desc">Quickly add a workout entry</div>
+        </div>
+      </a>
+    </div>
+  </article>
+</section>
 {% endblock %}
 
 {% block scripts %}{% endblock %}
