@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}FitFlow{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__dot"></span>
+        <span class="brand__text">FitFlow</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page container -->
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Bottom nav (mobile-first) -->
+  <nav class="bottom-nav" aria-label="Primary">
+    <a class="bottom-nav__item" href="/" aria-label="Home">
+      <span class="bottom-nav__icon">⌂</span>
+      <span class="bottom-nav__label">Home</span>
+    </a>
+
+    <a class="bottom-nav__item" href="/workouts" aria-label="Workouts">
+      <span class="bottom-nav__icon">🏋️</span>
+      <span class="bottom-nav__label">Workouts</span>
+    </a>
+
+    <a class="bottom-nav__item" href="/diet" aria-label="Diet">
+      <span class="bottom-nav__icon">🍽️</span>
+      <span class="bottom-nav__label">Diet</span>
+    </a>
+
+    <a class="bottom-nav__item" href="/timer" aria-label="Timer">
+      <span class="bottom-nav__icon">⏱</span>
+      <span class="bottom-nav__label">Timer</span>
+    </a>
+
+    {% if session.get("user_id") %}
+      <a class="bottom-nav__item" href="/logout" aria-label="Logout">
+        <span class="bottom-nav__icon">🚪</span>
+        <span class="bottom-nav__label">Logout</span>
+      </a>
+    {% else %}
+      <a class="bottom-nav__item" href="/login" aria-label="Login">
+        <span class="bottom-nav__icon">👤</span>
+        <span class="bottom-nav__label">Login</span>
+      </a>
+    {% endif %}
+  </nav>
+  
+  {% block scripts %}{% endblock %}
+</body>
+</html>

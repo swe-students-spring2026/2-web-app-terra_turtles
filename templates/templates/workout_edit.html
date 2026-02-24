@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Workout · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Edit Workout</h1>
+    <p class="page-subtitle">Update the workout entry.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="form" method="POST" action="/workouts/{{ workout._id }}/edit" autocomplete="off">
+    <label class="label" for="date">Date</label>
+    <input class="input" id="date" name="date" type="date" value="{{ workout.date }}" required />
+
+    <label class="label" for="exercise">Exercise</label>
+    <input class="input" id="exercise" name="exercise" type="text" value="{{ workout.exercise }}" required />
+
+    <label class="label" for="sets">Sets</label>
+    <input class="input" id="sets" name="sets" type="number" min="1" value="{{ workout.sets }}" required />
+
+    <label class="label" for="reps">Reps</label>
+    <input class="input" id="reps" name="reps" type="number" min="1" value="{{ workout.reps }}" required />
+
+    <label class="label" for="weight">Weight</label>
+    <input class="input" id="weight" name="weight" type="number" step="0.5" min="0" value="{{ workout.weight }}" required />
+
+    <label class="label" for="notes">Notes (optional)</label>
+    <input class="input" id="notes" name="notes" type="text" value="{{ workout.notes or '' }}" />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/workouts">Back</a>
+      <button class="btn btn--primary" type="submit">Save changes</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
