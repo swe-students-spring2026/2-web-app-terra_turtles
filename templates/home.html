@@ -10,7 +10,7 @@
     <p class="hero__subtitle">Track workouts + nutrition with clean data.</p>
 
     <div class="hero__actions">
-      {% if session.get("user_id") %}
+      {% if current_user.is_authenticated %}
         <a class="btn btn--primary" href="/workouts/new">+ Log Workout</a>
         <a class="btn btn--secondary" href="/diet/new">+ Log Meal</a>
       {% else %}
