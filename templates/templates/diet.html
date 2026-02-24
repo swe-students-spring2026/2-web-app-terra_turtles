@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Diet · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Diet</h1>
+    <p class="page-subtitle">Track meals and daily calories.</p>
+  </div>
+  <div class="page-head__right">
+    <a class="btn btn--primary" href="/diet/new">+ Add</a>
+  </div>
+</section>
+
+<section class="card">
+  <!-- Filter by date -->
+  <form class="searchbar" method="GET" action="/diet">
+    <input class="input" type="date" name="date" value="{{ date or '' }}">
+    <button class="btn btn--ghost" type="submit">Go</button>
+    <a class="btn btn--ghost" href="/diet">Clear</a>
+  </form>
+
+  <!-- Summary (server-calculated) -->
+  <div class="summary">
+    <div class="summary__item"><span>Calories</span><strong>{{ totals.calories }}</strong></div>
+    <div class="summary__item"><span>Protein</span><strong>{{ totals.protein }}</strong></div>
+    <div class="summary__item"><span>Carbs</span><strong>{{ totals.carbs }}</strong></div>
+    <div class="summary__item"><span>Fats</span><strong>{{ totals.fats }}</strong></div>
+  </div>
+
+  <!-- Search by meal name -->
+  <form class="searchbar" method="GET" action="/diet/search">
+    <input
+      class="input"
+      type="search"
+      name="q"
+      placeholder="Search meals by name..."
+      value="{{ q or '' }}"
+      autocomplete="off"
+    />
+    <button class="btn btn--ghost" type="submit">Search</button>
+    <a class="btn btn--ghost" href="/diet">Clear</a>
+  </form>
+
+  <div class="list" aria-live="polite">
+    {% if meals and meals|length > 0 %}
+      {% for m in meals %}
+        <div class="list__row">
+          <div class="list__main">
+            <div class="list__title">{{ m.meal }}</div>
+            <div class="list__meta">
+              <span>{{ m.date or "" }}</span>
+              <span> · </span>
+              <span>{{ m.calories }} cal</span>
+              <span> · </span>
+              <span>P {{ m.protein or 0 }} / C {{ m.carbs or 0 }} / F {{ m.fats or 0 }}</span>
+              {% if m.notes %}<span> · </span><span>{{ m.notes }}</span>{% endif %}
+            </div>
+          </div>
+
+          <div class="list__actions">
+            <a class="btn btn--ghost" href="/diet/{{ m._id }}/delete">Delete</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="list__empty">No meals found.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
