@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Rest Timer · LiftLog{% endblock %}
+
+{% block content %}
+  <section class="page-head">
+    <div class="page-head__left">
+      <h1 class="page-title">Rest Timer</h1>
+      <p class="page-subtitle">Keep rest periods consistent and measurable.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="timer-display" aria-live="polite">
+      <div class="timer-display__time" id="time-readout">00:00</div>
+      <div class="timer-display__label" id="timer-status">Ready</div>
+    </div>
+
+    <div class="timer-inputs">
+      <div>
+        <label class="label" for="mins">Minutes</label>
+        <input class="input" id="mins" type="number" min="0" step="1" inputmode="numeric" value="1" />
+      </div>
+      <div>
+        <label class="label" for="secs">Seconds</label>
+        <input class="input" id="secs" type="number" min="0" max="59" step="1" inputmode="numeric" value="30" />
+      </div>
+    </div>
+
+    <div class="timer-actions">
+      <button class="btn btn--primary" id="start-pause" type="button">Start</button>
+      <button class="btn btn--ghost" id="reset" type="button">Reset</button>
+    </div>
+
+    <div class="form-message" id="timer-message" aria-live="polite"></div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='javascript/timer.js') }}"></script>
+{% endblock %}
