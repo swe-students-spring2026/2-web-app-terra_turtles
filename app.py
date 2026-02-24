@@ -2,8 +2,9 @@ import os
 from datetime import datetime
 from bson import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import certifi
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -163,6 +164,63 @@ def login_post():
 def logout():
     logout_user()
     return redirect(url_for("home"))
+
+
+# Forgot / Reset password
+serializer = URLSafeTimedSerializer(app.secret_key)
+
+
+@app.get("/forgot-password")
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+    return render_template("forgot_password.html")
+
+
+@app.post("/forgot-password")
+def forgot_password_post():
+    email = (request.form.get("email") or "").strip().lower()
+
+    user_doc = db["users"].find_one({"email": email})
+    if not user_doc:
+        return render_template("forgot_password.html", error="No account found with that email.")
+
+    token = serializer.dumps(email, salt="reset-password")
+    return redirect(url_for("reset_password", token=token))
+
+
+@app.get("/reset-password/<token>")
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt="reset-password", max_age=900)
+    except (SignatureExpired, BadSignature):
+        return render_template("forgot_password.html", error="Reset link is invalid or has expired.")
+
+    return render_template("reset_password.html", token=token, email=email)
+
+
+@app.post("/reset-password/<token>")
+def reset_password_post(token):
+    try:
+        email = serializer.loads(token, salt="reset-password", max_age=900)
+    except (SignatureExpired, BadSignature):
+        return render_template("forgot_password.html", error="Reset link is invalid or has expired.")
+
+    password = request.form.get("password") or ""
+    confirm = request.form.get("confirm") or ""
+
+    if len(password) < 6:
+        return render_template("reset_password.html", token=token, email=email, error="Password must be at least 6 characters.")
+
+    if password != confirm:
+        return render_template("reset_password.html", token=token, email=email, error="Passwords do not match.")
+
+    db["users"].update_one(
+        {"email": email},
+        {"$set": {"password_hash": generate_password_hash(password, method="pbkdf2:sha256")}}
+    )
+
+    return redirect(url_for("login"))
 
 
 # Workouts (sets)
