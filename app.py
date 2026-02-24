@@ -4,6 +4,7 @@ from bson import ObjectId
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+import certifi
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -18,7 +19,7 @@ db_name = os.getenv("MONGO_DBNAME", "gym_info")
 if not mongo_uri:
     raise RuntimeError("MONGO_URI is not set in .env")
 
-client = MongoClient(mongo_uri)
+client = MongoClient(mongo_uri, tlsCAFile=certifi.where())
 db = client[db_name]
 
 # Flask-Login setup
