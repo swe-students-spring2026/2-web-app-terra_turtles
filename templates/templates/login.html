@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Login · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Login</h1>
+    <p class="page-subtitle">Access your workouts and diet logs.</p>
+  </div>
+</section>
+
+<section class="card">
+  {% if error %}
+    <div class="form-message">{{ error }}</div>
+  {% endif %}
+
+  <form class="form" method="POST" action="/login" autocomplete="off">
+    <label class="label" for="email">Email</label>
+    <input class="input" id="email" name="email" type="email" placeholder="you@example.com" required />
+
+    <label class="label" for="password">Password</label>
+    <input class="input" id="password" name="password" type="password" placeholder="••••••••" required />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/register">Create account</a>
+      <button class="btn btn--primary" type="submit">Login</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

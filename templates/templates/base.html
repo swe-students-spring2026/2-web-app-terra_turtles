@@ -47,11 +47,7 @@
       <span class="bottom-nav__label">Timer</span>
     </a>
 
-<<<<<<< HEAD
-    {% if current_user.is_authenticated %}
-=======
     {% if session.get("user_id") %}
->>>>>>> upstream/main
       <a class="bottom-nav__item" href="/logout" aria-label="Logout">
         <span class="bottom-nav__icon">🚪</span>
         <span class="bottom-nav__label">Logout</span>

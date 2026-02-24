@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}New Meal · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">New Meal</h1>
+    <p class="page-subtitle">Log calories and macros quickly.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="form" method="POST" action="/diet/new" autocomplete="off">
+    <label class="label" for="date">Date</label>
+    <input class="input" id="date" name="date" type="date" required />
+
+    <label class="label" for="meal">Meal name</label>
+    <input class="input" id="meal" name="meal" type="text" placeholder="e.g., Chicken bowl" required />
+
+    <div class="grid-2">
+      <div>
+        <label class="label" for="calories">Calories</label>
+        <input class="input" id="calories" name="calories" type="number" min="0" step="1" required />
+      </div>
+
+      <div>
+        <label class="label" for="protein">Protein (g)</label>
+        <input class="input" id="protein" name="protein" type="number" min="0" step="1" />
+      </div>
+
+      <div>
+        <label class="label" for="carbs">Carbs (g)</label>
+        <input class="input" id="carbs" name="carbs" type="number" min="0" step="1" />
+      </div>
+
+      <div>
+        <label class="label" for="fats">Fats (g)</label>
+        <input class="input" id="fats" name="fats" type="number" min="0" step="1" />
+      </div>
+    </div>
+
+    <label class="label" for="notes">Notes (optional)</label>
+    <input class="input" id="notes" name="notes" type="text" placeholder="e.g., post-workout meal" />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/diet">Cancel</a>
+      <button class="btn btn--primary" type="submit">Save meal</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
