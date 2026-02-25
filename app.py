@@ -10,9 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "dev-secret")  # local dev fallback
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
-# Mongo connection (created once at startup)
 mongo_uri = os.getenv("MONGO_URI")
 db_name = os.getenv("MONGO_DBNAME", "gym_info")
 if not mongo_uri:
@@ -22,7 +21,6 @@ client = MongoClient(mongo_uri)
 db = client[db_name]
 
 
-# small helpers
 def to_int(v, default=0):
     try:
         return int(v)
@@ -52,13 +50,39 @@ def current_user_id():
     return session.get("user_id")
 
 
-# home 
 @app.get("/")
 def home():
-    return render_template("home.html")
+    if not require_login():
+        return render_template(
+            "home.html",
+            today_workouts=0,
+            today_calories=0,
+            today_protein=0,
+            recent_workouts=[]
+        )
+
+    uid = current_user_id()
+    today = datetime.now().date().isoformat()
+
+    today_workouts = db["sets"].count_documents({"user_id": uid, "date": today})
+
+    meals_today = list(db["meals"].find({"user_id": uid, "date": today}))
+    today_calories = sum(to_int(m.get("calories")) for m in meals_today)
+    today_protein = sum(to_int(m.get("protein")) for m in meals_today)
+
+    recent_workouts = list(
+        db["sets"].find({"user_id": uid}).sort("_id", -1).limit(7)
+    )
+
+    return render_template(
+        "home.html",
+        today_workouts=today_workouts,
+        today_calories=today_calories,
+        today_protein=today_protein,
+        recent_workouts=recent_workouts
+    )
 
 
-# auth
 @app.get("/register")
 def register():
     return render_template("register.html")
@@ -119,7 +143,6 @@ def logout():
     return redirect(url_for("home"))
 
 
-# workouts (collection: sets)
 @app.get("/workouts")
 def workouts():
     if not require_login():
@@ -239,7 +262,6 @@ def workout_delete_post(id):
     return redirect(url_for("workouts"))
 
 
-# diet (collection: meals)
 def meal_totals(meals):
     return {
         "calories": sum(to_int(m.get("calories")) for m in meals),
@@ -336,7 +358,6 @@ def diet_delete_post(id):
     return redirect(url_for("diet"))
 
 
-# timer
 @app.get("/timer")
 def timer():
     return render_template("timer.html")
