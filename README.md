@@ -118,18 +118,17 @@ Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
 ### 3) Create and activate a virtual environment
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+pipenv shell
 ```
 
 ### 4) Install dependencies
 ```bash
-pip install -r requirements.txt
+pipenv install
 ```
 
 ### 5) Run the Flask app
 ```bash
-python3 app.py
+pipenv run python3 app.py
 ```
 
 ### 6) Open in browser
@@ -153,17 +152,16 @@ Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
 ### 3) Create and activate a virtual environment
 ```bash
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
+pipenv shell
 ```
 
 ### 4) Install dependencies
 ```bash
-pip install -r requirements.txt
+pipenv install
 ```
 ### 5) Run the Flask app
 ```bash
-py app.py
+pipenv run python app.py
 ```
 ### 6) Open in browser
 
@@ -181,18 +179,17 @@ cd 2-web-app-terra_turtles
 
 ### 3) Create and activate a virtual environment
 ```bash
-py -m venv .venv
-.\.venv\Scripts\activate
+pipenv shell
 ```
 
 ### 4) Install dependencies
 ```bash
-pip install -r requirements.txt
+pipenv install
 ```
 
 ### 5) Run the Flask app
 ```bash
-py app.py
+pipenv run python app.py
 ```
 
 ### 6) Open in browser
