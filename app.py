@@ -1,9 +1,11 @@
 import os
 from datetime import datetime
-
 from bson import ObjectId
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+import certifi
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,33 +13,56 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
 mongo_uri = os.getenv("MONGO_URI")
 db_name = os.getenv("MONGO_DBNAME", "gym_info")
+
 if not mongo_uri:
     raise RuntimeError("MONGO_URI is not set in .env")
 
-client = MongoClient(mongo_uri)
+client = MongoClient(mongo_uri, tlsCAFile=certifi.where())
 db = client[db_name]
 
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
-def to_int(v, default=0):
+
+class User(UserMixin):
+    def __init__(self, user_doc):
+        self.id = str(user_doc["_id"])
+        self.name = user_doc.get("name", "")
+        self.email = user_doc.get("email", "")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    user_doc = db["users"].find_one({"_id": ObjectId(user_id)})
+    if user_doc:
+        return User(user_doc)
+    return None
+
+
+# Helpers
+def to_int(value, default=0):
     try:
-        return int(v)
+        return int(value)
     except (TypeError, ValueError):
         return default
 
 
-def to_float(v, default=0.0):
+def to_float(value, default=0.0):
     try:
-        return float(v)
+        return float(value)
     except (TypeError, ValueError):
         return default
 
 
-def oid(v):
+def to_oid(value):
     try:
-        return ObjectId(v)
+        return ObjectId(value)
     except Exception:
         return None
 
@@ -52,7 +77,7 @@ def current_user_id():
 
 @app.get("/")
 def home():
-    if not require_login():
+    if not current_user.is_authenticated:
         return render_template(
             "home.html",
             today_workouts=0,
@@ -61,7 +86,7 @@ def home():
             recent_workouts=[]
         )
 
-    uid = current_user_id()
+    uid = current_user.id
     today = datetime.now().date().isoformat()
 
     today_workouts = db["sets"].count_documents({"user_id": uid, "date": today})
@@ -83,8 +108,11 @@ def home():
     )
 
 
+# Auth
 @app.get("/register")
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
     return render_template("register.html")
 
 
@@ -107,18 +135,22 @@ def register_post():
     if db["users"].find_one({"email": email}):
         return render_template("register.html", error="Email already registered.")
 
-    db["users"].insert_one({
+    result = db["users"].insert_one({
         "name": name,
         "email": email,
         "password_hash": generate_password_hash(password, method="pbkdf2:sha256"),
         "created_at": datetime.utcnow(),
     })
 
-    return redirect(url_for("login"))
+    user_doc = db["users"].find_one({"_id": result.inserted_id})
+    login_user(User(user_doc))
+    return redirect(url_for("home"))
 
 
 @app.get("/login")
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
     return render_template("login.html")
 
 
@@ -127,60 +159,110 @@ def login_post():
     email = (request.form.get("email") or "").strip().lower()
     password = request.form.get("password") or ""
 
-    user = db["users"].find_one({"email": email})
-    if not user or not check_password_hash(user.get("password_hash", ""), password):
+    user_doc = db["users"].find_one({"email": email})
+    if not user_doc or not check_password_hash(user_doc.get("password_hash", ""), password):
         return render_template("login.html", error="Invalid email or password.")
 
-    session["user_id"] = str(user["_id"])
-    session["user_name"] = user.get("name", "")
-    session["email"] = user["email"]
+    login_user(User(user_doc))
     return redirect(url_for("home"))
 
 
 @app.get("/logout")
+@login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for("home"))
 
 
-@app.get("/workouts")
-def workouts():
-    if not require_login():
-        return redirect(url_for("login"))
+# Forgot / Reset password
+serializer = URLSafeTimedSerializer(app.secret_key)
 
-    items = list(db["sets"].find({"user_id": current_user_id()}).sort("_id", -1))
-    return render_template("workouts.html", workouts=items)
+
+@app.get("/forgot-password")
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
+    return render_template("forgot_password.html")
+
+
+@app.post("/forgot-password")
+def forgot_password_post():
+    email = (request.form.get("email") or "").strip().lower()
+
+    user_doc = db["users"].find_one({"email": email})
+    if not user_doc:
+        return render_template("forgot_password.html", error="No account found with that email.")
+
+    token = serializer.dumps(email, salt="reset-password")
+    return redirect(url_for("reset_password", token=token))
+
+
+@app.get("/reset-password/<token>")
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt="reset-password", max_age=900)
+    except (SignatureExpired, BadSignature):
+        return render_template("forgot_password.html", error="Reset link is invalid or has expired.")
+
+    return render_template("reset_password.html", token=token, email=email)
+
+
+@app.post("/reset-password/<token>")
+def reset_password_post(token):
+    try:
+        email = serializer.loads(token, salt="reset-password", max_age=900)
+    except (SignatureExpired, BadSignature):
+        return render_template("forgot_password.html", error="Reset link is invalid or has expired.")
+
+    password = request.form.get("password") or ""
+    confirm = request.form.get("confirm") or ""
+
+    if len(password) < 6:
+        return render_template("reset_password.html", token=token, email=email, error="Password must be at least 6 characters.")
+
+    if password != confirm:
+        return render_template("reset_password.html", token=token, email=email, error="Passwords do not match.")
+
+    db["users"].update_one(
+        {"email": email},
+        {"$set": {"password_hash": generate_password_hash(password, method="pbkdf2:sha256")}}
+    )
+
+    return redirect(url_for("login"))
+
+
+# Workouts (sets)
+@app.get("/workouts")
+@login_required
+def workouts():
+    workouts = list(db["sets"].find({"user_id": current_user.id}).sort("_id", -1))
+    return render_template("workouts.html", workouts=workouts)
 
 
 @app.get("/workouts/search")
+@login_required
 def workouts_search():
-    if not require_login():
-        return redirect(url_for("login"))
-
     q = (request.args.get("q") or "").strip()
-    base = {"user_id": current_user_id()}
-    if q:
-        base["exercise"] = {"$regex": q, "$options": "i"}
+    query = {"user_id": current_user.id}
 
-    items = list(db["sets"].find(base).sort("_id", -1))
-    return render_template("workouts.html", workouts=items, q=q)
+    if q:
+        query["exercise"] = {"$regex": q, "$options": "i"}
+
+    workouts = list(db["sets"].find(query).sort("_id", -1))
+    return render_template("workouts.html", workouts=workouts, q=q)
 
 
 @app.get("/workouts/new")
+@login_required
 def workout_new():
-    if not require_login():
-        return redirect(url_for("login"))
-
     return render_template("workout_new.html")
 
 
 @app.post("/workouts/new")
+@login_required
 def workout_new_post():
-    if not require_login():
-        return redirect(url_for("login"))
-
     doc = {
-        "user_id": current_user_id(),
+        "user_id": current_user.id,
         "date": request.form.get("date"),
         "exercise": (request.form.get("exercise") or "").strip(),
         "sets": to_int(request.form.get("sets")),
@@ -194,32 +276,28 @@ def workout_new_post():
 
 
 @app.get("/workouts/<id>/edit")
+@login_required
 def workout_edit(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid workout id", 400
 
-    item = db["sets"].find_one({"_id": _id, "user_id": current_user_id()})
-    if not item:
+    workout = db["sets"].find_one({"_id": _id, "user_id": current_user.id})
+    if not workout:
         return "Workout not found", 404
 
-    return render_template("workout_edit.html", workout=item)
+    return render_template("workout_edit.html", workout=workout)
 
 
 @app.post("/workouts/<id>/edit")
+@login_required
 def workout_edit_post(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid workout id", 400
 
     db["sets"].update_one(
-        {"_id": _id, "user_id": current_user_id()},
+        {"_id": _id, "user_id": current_user.id},
         {"$set": {
             "date": request.form.get("date"),
             "exercise": (request.form.get("exercise") or "").strip(),
@@ -234,34 +312,31 @@ def workout_edit_post(id):
 
 
 @app.get("/workouts/<id>/delete")
+@login_required
 def workout_delete(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid workout id", 400
 
-    item = db["sets"].find_one({"_id": _id, "user_id": current_user_id()})
-    if not item:
+    workout = db["sets"].find_one({"_id": _id, "user_id": current_user.id})
+    if not workout:
         return "Workout not found", 404
 
-    return render_template("workout_delete.html", workout=item)
+    return render_template("workout_delete.html", workout=workout)
 
 
 @app.post("/workouts/<id>/delete")
+@login_required
 def workout_delete_post(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid workout id", 400
 
-    db["sets"].delete_one({"_id": _id, "user_id": current_user_id()})
+    db["sets"].delete_one({"_id": _id, "user_id": current_user.id})
     return redirect(url_for("workouts"))
 
 
+# Diet (meals)
 def meal_totals(meals):
     return {
         "calories": sum(to_int(m.get("calories")) for m in meals),
@@ -272,12 +347,11 @@ def meal_totals(meals):
 
 
 @app.get("/diet")
+@login_required
 def diet():
-    if not require_login():
-        return redirect(url_for("login"))
-
     date = (request.args.get("date") or "").strip()
-    query = {"user_id": current_user_id()}
+    query = {"user_id": current_user.id}
+
     if date:
         query["date"] = date
 
@@ -287,12 +361,11 @@ def diet():
 
 
 @app.get("/diet/search")
+@login_required
 def diet_search():
-    if not require_login():
-        return redirect(url_for("login"))
-
     q = (request.args.get("q") or "").strip()
-    query = {"user_id": current_user_id()}
+    query = {"user_id": current_user.id}
+
     if q:
         query["meal"] = {"$regex": q, "$options": "i"}
 
@@ -302,20 +375,16 @@ def diet_search():
 
 
 @app.get("/diet/new")
+@login_required
 def diet_new():
-    if not require_login():
-        return redirect(url_for("login"))
-
     return render_template("diet_new.html")
 
 
 @app.post("/diet/new")
+@login_required
 def diet_new_post():
-    if not require_login():
-        return redirect(url_for("login"))
-
     doc = {
-        "user_id": current_user_id(),
+        "user_id": current_user.id,
         "date": request.form.get("date"),
         "meal": (request.form.get("meal") or "").strip(),
         "calories": to_int(request.form.get("calories")),
@@ -330,34 +399,31 @@ def diet_new_post():
 
 
 @app.get("/diet/<id>/delete")
+@login_required
 def diet_delete(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid meal id", 400
 
-    item = db["meals"].find_one({"_id": _id, "user_id": current_user_id()})
-    if not item:
+    meal = db["meals"].find_one({"_id": _id, "user_id": current_user.id})
+    if not meal:
         return "Meal not found", 404
 
-    return render_template("diet_delete.html", meal=item)
+    return render_template("diet_delete.html", meal=meal)
 
 
 @app.post("/diet/<id>/delete")
+@login_required
 def diet_delete_post(id):
-    if not require_login():
-        return redirect(url_for("login"))
-
-    _id = oid(id)
+    _id = to_oid(id)
     if not _id:
         return "Invalid meal id", 400
 
-    db["meals"].delete_one({"_id": _id, "user_id": current_user_id()})
+    db["meals"].delete_one({"_id": _id, "user_id": current_user.id})
     return redirect(url_for("diet"))
 
 
+# Timer
 @app.get("/timer")
 def timer():
     return render_template("timer.html")
