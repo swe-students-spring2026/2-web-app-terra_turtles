@@ -13,6 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
 mongo_uri = os.getenv("MONGO_URI")
 db_name = os.getenv("MONGO_DBNAME", "gym_info")
@@ -66,7 +67,14 @@ def to_oid(value):
         return None
 
 
-# Home
+def require_login():
+    return session.get("user_id") is not None
+
+
+def current_user_id():
+    return session.get("user_id")
+
+
 @app.get("/")
 def home():
     if not current_user.is_authenticated:

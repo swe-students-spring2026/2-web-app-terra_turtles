@@ -5,7 +5,7 @@ import datetime
 user_id = input("Enter your mongodb user id: ")
 password = input("Enter your mongodb password: ")
 
-connection = pymongo.MongoClient("mongodb+srv://"+user_id+":"+password+"@terraturtles.rufwskm.mongodb.net/?appName=TerraTurtles")
+connection = pymongo.MongoClient("mongodb://localhost:27017")
 db = connection["gym_info"]
 sets = db["sets"]
 meals = db["meals"]

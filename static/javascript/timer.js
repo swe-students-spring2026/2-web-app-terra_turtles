@@ -1,9 +1,5 @@
 /* timer.js
- * Rest timer:
- * - User sets minutes/seconds
- * - Start/Pause toggles countdown
- * - Reset returns to the configured time
- * - Simple completion alert + status text
+ * Simple rest timer with start/pause/reset.
  */
 
 (function () {
@@ -63,8 +59,8 @@
     intervalId = null;
   }
 
-  function setRunning(nextRunning) {
-    running = nextRunning;
+  function setRunning(next) {
+    running = next;
     startPauseBtn.textContent = running ? "Pause" : "Start";
     setStatus(running ? "Running" : "Ready");
   }
@@ -73,31 +69,10 @@
     stopInterval();
     remainingMs = 0;
     render();
-    setRunning(false);
+    running = false;
+    startPauseBtn.textContent = "Start";
     setStatus("Done");
     setMessage("Rest complete.");
-
-    // Simple audio beep using Web Audio API (no external files)
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = 880;
-      gain.gain.value = 0.05;
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      setTimeout(() => {
-        osc.stop();
-        ctx.close();
-      }, 200);
-    } catch (e) {
-      // Ignore audio errors (some browsers block autoplay audio)
-    }
-
-    // Visual confirmation for users
-    window.alert("Rest complete!");
   }
 
   function tick() {
@@ -112,7 +87,6 @@
   function start() {
     if (running) return;
 
-    // If remaining time is 0, reset to base time first
     if (remainingMs <= 0) {
       baseMs = readBaseMsFromInputs();
       remainingMs = baseMs;
@@ -133,7 +107,8 @@
   function pause() {
     if (!running) return;
     stopInterval();
-    setRunning(false);
+    running = false;
+    startPauseBtn.textContent = "Start";
     setStatus("Paused");
   }
 
@@ -142,18 +117,19 @@
     baseMs = readBaseMsFromInputs();
     remainingMs = baseMs;
     render();
-    setRunning(false);
-    setMessage("");
+    running = false;
+    startPauseBtn.textContent = "Start";
     setStatus("Ready");
+    setMessage("");
   }
 
-  // Input changes update the base time when not running
   function onInputChange() {
     if (running) return;
     baseMs = readBaseMsFromInputs();
     remainingMs = baseMs;
     render();
     setMessage("");
+    setStatus("Ready");
   }
 
   startPauseBtn.addEventListener("click", () => {
@@ -161,14 +137,11 @@
     else start();
   });
 
-  resetBtn.addEventListener("click", () => {
-    reset();
-  });
+  resetBtn.addEventListener("click", reset);
 
   minsEl.addEventListener("change", onInputChange);
   secsEl.addEventListener("change", onInputChange);
 
-  // Initialize
   baseMs = readBaseMsFromInputs();
   remainingMs = baseMs;
   render();

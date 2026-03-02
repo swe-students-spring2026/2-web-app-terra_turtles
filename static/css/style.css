@@ -7,7 +7,7 @@
   --muted:#666;
   --border:rgba(0,0,0,.08);
   --shadow: 0 10px 30px rgba(0,0,0,.12);
-  --shadow-hard: 0 8px 0 rgba(0,0,0,.85); /* 黑色“硬阴影” */
+  --shadow-hard: 0 8px 0 rgba(0,0,0,.85);
 }
 
 *{ box-sizing:border-box; }
@@ -22,7 +22,7 @@ body{
     var(--bg);
 }
 
-/* ---------- Layout ---------- */
+/* Layout */
 .topbar{
   position:sticky;
   top:0;
@@ -42,10 +42,10 @@ body{
 .page{
   max-width:520px;
   margin:0 auto;
-  padding:16px 16px 92px; /* 底部nav空间 */
+  padding:16px 16px 92px;
 }
 
-/* ---------- Brand ---------- */
+/* Brand */
 .brand{
   display:flex;
   align-items:center;
@@ -61,7 +61,7 @@ body{
   letter-spacing:.2px;
 }
 
-/* ---------- Chips ---------- */
+/* Chips */
 .chip{
   display:inline-flex;
   align-items:center;
@@ -82,7 +82,7 @@ body{
 }
 .chip__text{ font-weight:700; }
 
-/* ---------- Hero ---------- */
+/* Hero  */
 .hero{
   position:relative;
   border-radius:22px;
@@ -119,7 +119,7 @@ body{
   flex-wrap:wrap;
 }
 
-/* ---------- Cards ---------- */
+/* Cards */
 .grid{
   margin-top:14px;
   display:grid;
@@ -151,7 +151,7 @@ body{
   flex-wrap:wrap;
 }
 
-/* ---------- Stats ---------- */
+/* Stats */
 .stats{
   display:grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -173,7 +173,7 @@ body{
   font-weight:850;
 }
 
-/* ---------- List ---------- */
+/* List */
 .list{
   display:flex;
   flex-direction:column;
@@ -211,7 +211,7 @@ body{
   color: rgba(0,0,0,.45);
 }
 
-/* ---------- Tools ---------- */
+/* Tools */
 .tool-row{
   display:flex;
   flex-direction:column;
@@ -238,7 +238,7 @@ body{
 .tool__title{ font-weight:850; }
 .tool__desc{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-/* ---------- Buttons: white + black shadow ---------- */
+/* Buttons: white + black shadow  */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -271,7 +271,7 @@ body{
   background: rgba(255,255,255,.65);
 }
 
-/* ---------- Links ---------- */
+/*  Links  */
 .link{
   color: var(--nyu-purple);
   font-weight:800;
@@ -279,7 +279,7 @@ body{
 }
 .link:active{ opacity:.75; }
 
-/* ---------- Bottom nav ---------- */
+/*  Bottom nav  */
 .bottom-nav{
   position:fixed;
   left:0; right:0; bottom:0;
@@ -506,4 +506,22 @@ body{
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 12px;
+}
+
+.timer-readout {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.timer-readout__time {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
+.timer-readout__meta {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
