@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash
@@ -83,11 +83,30 @@ def home():
             today_workouts=0,
             today_calories=0,
             today_protein=0,
-            recent_workouts=[]
+            recent_workouts=[],
+            calories_data=[]
         )
 
     uid = current_user.id
     today = datetime.now().date().isoformat()
+
+    thirty_days_ago = (datetime.now() - timedelta(days=30)).date().isoformat()
+
+    meals_monthly = list(db["meals"].find({"user_id": uid, "date": {"$gte": thirty_days_ago}}))
+    
+    # Group by date and sum calories
+    daily_totals = {}
+    for meal in meals_monthly:
+        date = meal.get("date")
+        cals = to_int(meal.get("calories"))
+        if date:
+            daily_totals[date] = daily_totals.get(date, 0) + cals
+    
+    # Convert to list of dicts, sorted by date
+    calories_data = [
+        {"date": date, "calories": cals}
+        for date, cals in sorted(daily_totals.items())
+    ]
 
     today_workouts = db["sets"].count_documents({"user_id": uid, "date": today})
 
@@ -104,7 +123,8 @@ def home():
         today_workouts=today_workouts,
         today_calories=today_calories,
         today_protein=today_protein,
-        recent_workouts=recent_workouts
+        recent_workouts=recent_workouts,
+        calories_data=calories_data
     )
 
 
