@@ -27,6 +27,7 @@
           data: caloriesData.map((item) => item.calories),
           tension: 0.25,
           pointRadius: 0,
+          borderColor: "#7b2cbf",
         },
       ],
     },
