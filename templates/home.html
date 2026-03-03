@@ -54,33 +54,33 @@ content %}
       <span class="chip chip--ghost">Last 7 entries</span>
     </div>
 
+    <div class="list">
+      {% if recent_workouts %} {% for w in recent_workouts %}
+      <a
+        class="list__row"
+        href="/workouts"
+        style="text-decoration: none; color: inherit"
+      >
+        <div class="list__main">
+          <div class="list__title">{{ w.exercise }}</div>
+          <div class="list__meta">
+            <span>{{ w.date or "" }}</span>
+            <span> · </span>
+            <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
+          </div>
+        </div>
+        <div class="list__right">›</div>
+      </a>
+      {% endfor %} {% else %}
+      <div class="list__empty">No workouts yet. Log your first set.</div>
+      {% endif %}
+    </div>
+
     <div class="card__footer">
       <a class="btn btn--ghost" href="/workouts">Open workouts</a>
       <a class="btn btn--ghost" href="/timer">Rest timer</a>
     </div>
   </article>
-
-  <div class="list">
-    {% if recent_workouts %} {% for w in recent_workouts %}
-    <a
-      class="list__row"
-      href="/workouts"
-      style="text-decoration: none; color: inherit"
-    >
-      <div class="list__main">
-        <div class="list__title">{{ w.exercise }}</div>
-        <div class="list__meta">
-          <span>{{ w.date or "" }}</span>
-          <span> · </span>
-          <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
-        </div>
-      </div>
-      <div class="list__right">›</div>
-    </a>
-    {% endfor %} {% else %}
-    <div class="list__empty">No workouts yet. Log your first set.</div>
-    {% endif %}
-  </div>
 
   <!-- Calories Visualization -->
   <article class="card">

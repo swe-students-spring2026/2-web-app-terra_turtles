@@ -24,10 +24,25 @@
       }),
       datasets: [
         {
-          label: "Calories",
           data: caloriesData.map((item) => item.calories),
+          tension: 0.25,
+          pointRadius: 0,
         },
       ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 10,
+          },
+        },
+      },
     },
   });
 })();
