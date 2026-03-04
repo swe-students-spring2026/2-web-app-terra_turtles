@@ -18,7 +18,7 @@
   <form class="searchbar" method="GET" action="/diet">
     <input class="input" type="date" name="date" value="{{ date or '' }}">
     <button class="btn btn--ghost" type="submit">Go</button>
-    <a class="btn btn--ghost" href="/diet">Clear</a>
+    <a class="btn btn--ghost" href="/diet?date={{ today }}">Today</a>
   </form>
 
   <div class="card__header" style="margin-bottom:8px;">

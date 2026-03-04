@@ -49,6 +49,44 @@
     </div>
   </article>
 
+  {% if goals %}
+  <article class="card">
+    <div class="card__header">
+      <h2 class="card__title">Daily Goals</h2>
+      <span class="chip chip--ghost">Progress</span>
+    </div>
+
+    <div class="goal-list">
+      <div class="goal-row">
+        <div class="goal-row__label">Workouts: {{ today_workouts }} / {{ goals.workouts_per_day }}</div>
+        <div class="goal-progress"><div class="goal-progress__fill" style="width: {{ goals_progress.workouts_pct or 0 }}%"></div></div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-row__label">Calories: {{ today_calories }} / {{ goals.calories_per_day }}</div>
+        <div class="goal-progress"><div class="goal-progress__fill {% if goals_progress.calories_over %}goal-progress__fill--warn{% endif %}" style="width: {{ goals_progress.calories_pct or 0 }}%"></div></div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-row__label">Protein: {{ today_protein }} / {{ goals.protein_g_per_day }} g</div>
+        <div class="goal-progress"><div class="goal-progress__fill goal-progress__fill--ok" style="width: {{ goals_progress.protein_pct or 0 }}%"></div></div>
+      </div>
+    </div>
+
+    <div class="card__footer">
+      <a class="btn btn--ghost" href="/goals">Edit goals</a>
+    </div>
+  </article>
+  {% else %}
+  <article class="card">
+    <div class="card__header">
+      <h2 class="card__title">Daily Goals</h2>
+    </div>
+    <p class="list__empty">Set your first goals for workouts, calories, and protein.</p>
+    <div class="card__footer">
+      <a class="btn btn--ghost" href="/goals">Set goals</a>
+    </div>
+  </article>
+  {% endif %}
+
   <!-- Recent workouts -->
   <article class="card">
     <div class="card__header">
@@ -110,6 +148,14 @@
         <div class="tool__text">
           <div class="tool__title">Recipes</div>
           <div class="tool__desc">Simple meals</div>
+        </div>
+      </a>
+
+      <a class="tool" href="/goals">
+        <div class="tool__icon tool__icon--bmi"></div>
+        <div class="tool__text">
+          <div class="tool__title">Goals</div>
+          <div class="tool__desc">Set daily targets</div>
         </div>
       </a>
     </div>

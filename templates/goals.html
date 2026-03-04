@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Goals · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Daily Goals</h1>
+    <p class="page-subtitle">Set targets for workouts and nutrition.</p>
+  </div>
+</section>
+
+<section class="card">
+  {% if error %}
+    <div class="form-error">{{ error }}</div>
+  {% endif %}
+
+  <form class="form" method="POST" action="/goals" autocomplete="off">
+    <label class="label" for="workouts_per_day">Workouts per day</label>
+    <input
+      class="input"
+      id="workouts_per_day"
+      name="workouts_per_day"
+      type="number"
+      min="1"
+      step="1"
+      value="{{ (goal.workouts_per_day if goal else 1) }}"
+      required
+    />
+
+    <label class="label" for="calories_per_day">Calories per day</label>
+    <input
+      class="input"
+      id="calories_per_day"
+      name="calories_per_day"
+      type="number"
+      min="0"
+      step="1"
+      value="{{ (goal.calories_per_day if goal else 2200) }}"
+      required
+    />
+
+    <label class="label" for="protein_g_per_day">Protein (g) per day</label>
+    <input
+      class="input"
+      id="protein_g_per_day"
+      name="protein_g_per_day"
+      type="number"
+      min="0"
+      step="1"
+      value="{{ (goal.protein_g_per_day if goal else 140) }}"
+      required
+    />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/">Back</a>
+      <button class="btn btn--primary" type="submit">Save goals</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

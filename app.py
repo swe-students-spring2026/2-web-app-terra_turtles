@@ -132,7 +132,9 @@ def home():
             today_calories=0,
             today_protein=0,
             recent_workouts=[],
-            calories_data=[]
+            calories_data=[],
+            goals=None,
+            goals_progress={}
         )
 
     uid = current_user.id
@@ -162,6 +164,22 @@ def home():
     today_calories = sum(to_int(m.get("calories")) for m in meals_today)
     today_protein = sum(to_int(m.get("protein")) for m in meals_today)
 
+    goals = db["goals"].find_one({"user_id": uid})
+    goals_progress = {}
+    if goals:
+        workouts_goal = to_int(goals.get("workouts_per_day"))
+        calories_goal = to_int(goals.get("calories_per_day"))
+        protein_goal = to_int(goals.get("protein_g_per_day"))
+
+        goals_progress = {
+            "workouts_pct": min(100, round((today_workouts / workouts_goal) * 100)) if workouts_goal > 0 else 0,
+            "calories_pct": min(100, round((today_calories / calories_goal) * 100)) if calories_goal > 0 else 0,
+            "protein_pct": min(100, round((today_protein / protein_goal) * 100)) if protein_goal > 0 else 0,
+            "calories_over": calories_goal > 0 and today_calories > calories_goal,
+            "protein_hit": protein_goal > 0 and today_protein >= protein_goal,
+            "workouts_hit": workouts_goal > 0 and today_workouts >= workouts_goal,
+        }
+
     recent_workouts = list(
         db["sets"].find({"user_id": uid}).sort("_id", -1).limit(7)
     )
@@ -172,7 +190,9 @@ def home():
         today_calories=today_calories,
         today_protein=today_protein,
         recent_workouts=recent_workouts,
-        calories_data=calories_data
+        calories_data=calories_data,
+        goals=goals,
+        goals_progress=goals_progress
     )
 
 
@@ -330,27 +350,41 @@ def profile_post():
 @app.get("/workouts")
 @login_required
 def workouts():
-    workouts = list(db["sets"].find({"user_id": current_user.id}).sort("_id", -1))
-    return render_template("workouts.html", workouts=workouts)
+    q = (request.args.get("q") or "").strip()
+    date = (request.args.get("date") or "").strip()
+    today = datetime.now().date().isoformat()
+
+    # Default filter is today's date unless user selected a different date.
+    active_date = date if date else today
+
+    query = {"user_id": current_user.id, "date": active_date}
+    if q:
+        query["exercise"] = {"$regex": q, "$options": "i"}
+
+    workouts = list(db["sets"].find(query).sort("_id", -1))
+    return render_template(
+        "workouts.html",
+        workouts=workouts,
+        q=q,
+        date=date,
+        today=today,
+        active_date=active_date,
+    )
 
 
 @app.get("/workouts/search")
 @login_required
 def workouts_search():
     q = (request.args.get("q") or "").strip()
-    query = {"user_id": current_user.id}
-
-    if q:
-        query["exercise"] = {"$regex": q, "$options": "i"}
-
-    workouts = list(db["sets"].find(query).sort("_id", -1))
-    return render_template("workouts.html", workouts=workouts, q=q)
+    date = (request.args.get("date") or "").strip()
+    return redirect(url_for("workouts", q=q, date=date))
 
 
 @app.get("/workouts/new")
 @login_required
 def workout_new():
-    return render_template("workout_new.html")
+    today = datetime.now().date().isoformat()
+    return render_template("workout_new.html", today=today)
 
 
 @app.post("/workouts/new")
@@ -447,13 +481,11 @@ def diet():
     date = (request.args.get("date") or "").strip()
     today = datetime.now().date().isoformat()
 
-    # active_date decides summary and target calculations
+    # Default the page to today's date unless user picked another date.
     active_date = date if date else today
 
-    # list meals behavior: if date provided, show meals for that date; if no date, show all meals (sorted by date desc)
-    query = {"user_id": current_user.id}
-    if date:
-        query["date"] = date
+    # Meals list is always filtered to the active date.
+    query = {"user_id": current_user.id, "date": active_date}
 
     meals = list(db["meals"].find(query).sort("_id", -1))
 
@@ -465,7 +497,7 @@ def diet():
         "diet.html",
         meals=meals,
         totals=totals,
-        date=date,
+        date=active_date,
         today=today,
         active_date=active_date
     )
@@ -650,6 +682,53 @@ def weights_delete_post(id):
         return "Invalid entry id", 400
     db["weights"].delete_one({"_id": _id, "user_id": current_user.id})
     return redirect(url_for("weights"))
+
+
+# Goals
+@app.get("/goals")
+@login_required
+def goals():
+    goal_doc = db["goals"].find_one({"user_id": current_user.id})
+    return render_template("goals.html", goal=goal_doc)
+
+
+@app.post("/goals")
+@login_required
+def goals_post():
+    workouts_per_day = to_int(request.form.get("workouts_per_day"))
+    calories_per_day = to_int(request.form.get("calories_per_day"))
+    protein_g_per_day = to_int(request.form.get("protein_g_per_day"))
+
+    if workouts_per_day < 1:
+        goal_doc = {
+            "workouts_per_day": workouts_per_day,
+            "calories_per_day": calories_per_day,
+            "protein_g_per_day": protein_g_per_day,
+        }
+        return render_template("goals.html", goal=goal_doc, error="Workouts goal must be at least 1.")
+    if calories_per_day < 0 or protein_g_per_day < 0:
+        goal_doc = {
+            "workouts_per_day": workouts_per_day,
+            "calories_per_day": calories_per_day,
+            "protein_g_per_day": protein_g_per_day,
+        }
+        return render_template("goals.html", goal=goal_doc, error="Calories and protein goals cannot be negative.")
+
+    db["goals"].update_one(
+        {"user_id": current_user.id},
+        {
+            "$set": {
+                "user_id": current_user.id,
+                "workouts_per_day": workouts_per_day,
+                "calories_per_day": calories_per_day,
+                "protein_g_per_day": protein_g_per_day,
+                "updated_at": datetime.utcnow(),
+            },
+            "$setOnInsert": {"created_at": datetime.utcnow()},
+        },
+        upsert=True,
+    )
+    return redirect(url_for("goals"))
 
 
 # BMI
