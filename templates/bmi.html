@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}BMI · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">BMI</h1>
+    <p class="page-subtitle">Enter height and weight to calculate BMI.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="form" id="bmiForm" autocomplete="off">
+    <div class="grid-2">
+      <div>
+        <label class="label" for="heightCm">Height (cm)</label>
+        <input class="input" id="heightCm" type="number" min="50" step="0.1" placeholder="e.g., 175" required />
+      </div>
+
+      <div>
+        <label class="label" for="weightKg">Weight (kg)</label>
+        <input class="input" id="weightKg" type="number" min="10" step="0.1" placeholder="e.g., 70" required />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn--primary" type="submit">Calculate</button>
+      <button class="btn btn--ghost" type="button" id="bmiReset">Clear</button>
+    </div>
+  </form>
+
+  <div class="bmi-result" id="bmiResult" style="display:none;">
+    <div class="bmi-result__top">
+      <div>
+        <div class="bmi-result__label">Your BMI</div>
+        <div class="bmi-result__value" id="bmiValue">--</div>
+      </div>
+      <div class="bmi-tag" id="bmiTag">--</div>
+    </div>
+
+    <div class="bmi-bar" aria-label="BMI bar">
+      <div class="bmi-bar__seg bmi-bar__seg--under"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--normal"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--over"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--obese"></div>
+      <div class="bmi-bar__marker" id="bmiMarker" aria-hidden="true"></div>
+    </div>
+
+    <div class="bmi-legend">
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--under"></span>
+        <span>Underweight</span>
+        <span class="bmi-range">&lt; 18.5</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--normal"></span>
+        <span>Normal</span>
+        <span class="bmi-range">18.5 – 24.9</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--over"></span>
+        <span>Overweight</span>
+        <span class="bmi-range">25.0 – 29.9</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--obese"></span>
+        <span>Obese</span>
+        <span class="bmi-range">≥ 30.0</span>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascript/bmi.js') }}"></script>
+{% endblock %}

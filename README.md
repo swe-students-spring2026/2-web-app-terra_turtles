@@ -8,86 +8,58 @@ A data-driven gym and nutrition tracking web app that helps users achieve consis
 
 
 ## Introduction to products
-The app idea is to build a gym tracker so that people can monitor their progress at the gym and make sure they are progressively overloading so they can make consistent strength and hypertrophy progress. Without a tracker, they won’t be able to see the data and their progress explicitly, which may cause them to stick to the same weight for a long time (until they “feel” it is getting easier, which is vague and varies day by day), causing them to not make as much progress as they could have. 
+FitFlow is a lightweight gym and diet tracker designed to make progress measurable. The app helps users log workouts with clear, consistent data—exercise name, sets, reps, weight, and date—so they can actually see whether they are progressively overloading over time. Instead of relying on vague “it feels easier today,” users can look back at their history and make training decisions based on real numbers.
 
-After the user inputs their data, it can create charts and visualizations to show their progress. Maybe after a certain amount of datapoints, the software can even run a linear/non linear regression to predict their future gains based on their past data, if they stay consistent. 
+The workout side of FitFlow focuses on fast logging and easy review. Users can add new workout entries, search past lifts, edit mistakes, and delete outdated logs. A built-in rest timer supports training flow in the gym, so users can keep rest periods consistent and reduce guesswork during sessions.
 
-But the core of the app is it tracks the date, and when the user hits the gym he inputs the exercise he is doing and the number of sets, reps, and weight of the exercise. 
-
-There can also be a timer in the app to track resting time. The goal is to make everything measurable. 
-
-Another idea is that the user can create their own workouts. For example, for back day they input the exercises they are going to do, and for each exercise they input the resting time and how many sets they want to do. Once they get to the gym, they can just boot up the app and the app will tell them how many sets they do and how long they rest between sets (with the timer). After each set, they can input the weight and reps for that set. This makes it so that most of the things are automated at the gym and the user doesn’t need to think a lot about it, and tracking is also easy because during rest time (which you can see with the timer) you just input the reps and weight (which is only 2 numbers, should take under 10 seconds). 
-
-For each user there is also a diet component to the app. They can input what they ate and about how many calories the food is. The diet component can have similar features as the gym component. 
+FitFlow also includes a diet tracker for daily intake. Users can log meals with estimated calories and macronutrients (protein, carbs, fats), view daily totals, and set a target calorie goal to see how far they are above or below for the day. Together, the workout and diet features give users a simple way to track both training and nutrition in one place—without making the process slow or distracting.
 
 
-## User stories
+# User stories
 
-### Gym Tracking – Core Logging
+## Gym Tracking – Core Logging
 
 As a gymgoer, I want to log exercises with sets, reps, and weight so that I can track my strength progression over time.
 
-As a gymgoer, I want to record the date of each workout automatically so that I can measure progress across weeks and months.
+As a gymgoer, I want to record the date of each workout so that I can measure progress across weeks and months.
 
-As a gymgoer, I want to see my previous performance for an exercise so that I know whether I am progressively overloading.
+As a gymgoer, I want to be able to see my history of workouts so that I know whether I am progressively overloading. 
 
-As a gymgoer, I want to view charts of my strength progression so that I can visually see improvement trends.
-
-As a gymgoer, I want the app to detect when I have stagnated on an exercise so that I know when to increase weight or adjust volume.
-
-As a gymgoer, I want predictions of future strength gains based on my past data so that I can set realistic goals.
+As a gymgoer, I want to be able to take notes on specific exercises that I did.  
 
 As a gymgoer, I want to track total workout volume (sets × reps × weight) so that I can measure training intensity objectively.
 
-### Gym Tracking – Workout Planning
-
-As a gymgoer, I want to create custom workouts (e.g., Back Day, Push Day) so that I can follow a structured program.
-
-As a gymgoer, I want to predefine the number of sets and rest time for each exercise so that my workout is automated and efficient.
-
-As a gymgoer, I want the app to guide me through my workout step-by-step so that I don’t need to think about what comes next.
-
 As a gymgoer, I want a built-in rest timer so that I can keep rest periods consistent and measurable.
-
-As a gymgoer, I want the timer to automatically start after I log a set so that I don’t waste time between sets.
 
 As a gymgoer, I want to quickly input reps and weight during rest so that logging does not interrupt my workout flow.
 
-As a gymgoer, I want to repeat a previous workout template so that I can maintain consistency across weeks.
-
-### Gym Tracking – Progress & Analytics
-
-As a gymgoer, I want to see my estimated 1RM (one-rep max) based on logged sets so that I can track strength without testing maxes.
-
-As a gymgoer, I want weekly and monthly summaries of workouts so that I can monitor consistency.
-
 As a gymgoer, I want to compare performance across time periods so that I can evaluate whether my program is working.
 
-As a gymgoer, I want reminders if I haven’t trained in several days so that I stay consistent.
+As a gymgoer, I want to modify the added workout content so that I can conveniently correct any wrongly entered information.
 
-### Diet Tracking
+As a gymgoer, I want to keep track of my weight changes so that I can adjust my training plan according to my weight.
+
+## Diet Tracking
 
 As a dieter, I want to log meals and estimated calories so that I can track my daily intake.
 
-As a dieter, I want to see total daily calories automatically calculated so that I know if I am in a surplus or deficit.
+As a dieter, I want to know precisely how many calories I have consumed throughout the day so that I can plan my meals accordingly.
 
 As a dieter, I want to track macronutrients (protein, carbs, fats) so that I can optimize for muscle gain or fat loss.
 
-As a dieter, I want weekly calorie averages so that I can see trends rather than daily fluctuations.
+As a dieter, I want weekly calorie averages so that I can see trends rather than daily fluctuations. ( calculate average of daily calories of last 7 days)
 
 As a dieter, I want to track body weight over time so that I can correlate diet with physical changes.
 
 As a dieter, I want visual graphs of weight and calorie intake so that I can see whether my nutrition aligns with my goals.
 
-### Combined User Stories (Gym + Diet)
+As a dieter, I want to be able to modify my diet plan so that if the data I input is inaccurate, I can correct it and recalculate.
 
-As a gymgoer and dieter, I want to see correlations between calorie intake and strength progress so that I understand how diet affects performance.
+As a dieter, I want to have a cooking tutorial with descriptions to teach me how to prepare healthy food, so that I can know how to eat more healthily.
 
-As a gymgoer and dieter, I want goal tracking (bulk, cut, maintenance) so that the app adjusts recommendations accordingly.
+As a dieter, I want to have a BMI calculator so that I can assess whether my weight is excessive.
 
-As a gymgoer and dieter, I want performance insights (e.g., strength plateau during calorie deficit) so that I can make informed adjustments.
-
-
+As a dieter, I want to have the option to input the calorie target for the current day, so that I can plan my three meals based on the difference.
 
 # Steps necessary to run the software
 
@@ -116,14 +88,14 @@ cp env.example .env
 ```
 Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
-### 3) Create and activate a virtual environment
-```bash
-pipenv shell
-```
-
-### 4) Install dependencies
+### 3) Install dependencies
 ```bash
 pipenv install
+```
+
+### 4) Create and activate a virtual environment
+```bash
+pipenv shell
 ```
 
 ### 5) Run the Flask app
@@ -132,10 +104,9 @@ pipenv run python3 app.py
 ```
 
 ### 6) Open in browser
-
-Go to:
-
+```bash
 http://127.0.0.1:5000/
+```
 
 
 ## windows (PowerShell)
@@ -150,24 +121,23 @@ copy env.example .env
 ```
 Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
-### 3) Create and activate a virtual environment
-```bash
-pipenv shell
-```
-
-### 4) Install dependencies
+### 3) Install dependencies
 ```bash
 pipenv install
+```
+
+### 4) Create and activate a virtual environment
+```bash
+pipenv shell
 ```
 ### 5) Run the Flask app
 ```bash
 pipenv run python app.py
 ```
 ### 6) Open in browser
-
-Go to:
-
+```bash
 http://127.0.0.1:5000/
+```
 
 
 ## Windows (Command Prompt / CMD)
@@ -177,14 +147,14 @@ git clone https://github.com/swe-students-spring2026/2-web-app-terra_turtles.git
 cd 2-web-app-terra_turtles
 ```
 
-### 3) Create and activate a virtual environment
-```bash
-pipenv shell
-```
-
-### 4) Install dependencies
+### 3) Install dependencies
 ```bash
 pipenv install
+```
+
+### 4) Create and activate a virtual environment
+```bash
+pipenv shell
 ```
 
 ### 5) Run the Flask app
@@ -193,13 +163,12 @@ pipenv run python app.py
 ```
 
 ### 6) Open in browser
-
-Go to:
-
+```bash
 http://127.0.0.1:5000/
+```
 
 
 
 ## Task boards
 
-https://github.com/orgs/swe-students-spring2026/projects/18
+[Project](https://github.com/orgs/swe-students-spring2026/projects)
