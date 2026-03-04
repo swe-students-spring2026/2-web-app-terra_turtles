@@ -777,3 +777,49 @@ body {
 .recipe-list li {
   margin: 6px 0;
 }
+
+/* ── 6-item bottom nav ───────────────────────────────────────────────────── */
+.bottom-nav--6 .bottom-nav__item {
+  width: 16.666%;
+  min-width: 52px;
+  padding: 6px 4px;
+}
+.bottom-nav--6 .bottom-nav__label {
+  font-size: 10px;
+}
+
+/* ── Topbar profile link ─────────────────────────────────────────────────── */
+.topbar__profile-link {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--nyu-purple);
+  text-decoration: none;
+}
+.topbar__profile-link:active {
+  opacity: 0.7;
+}
+
+/* ── Weight category inline pill (history rows) ──────────────────────────── */
+.weight-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.weight-tag--under  { background: rgba(255, 210, 0, 0.22); }
+.weight-tag--normal { background: rgba(70, 200, 120, 0.22); }
+.weight-tag--over   { background: rgba(255, 140, 0, 0.22); }
+.weight-tag--obese  { background: rgba(255, 80, 80, 0.22); }
+
+/* ── Danger box (delete confirmation) ───────────────────────────────────── */
+.danger-box {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(176, 42, 42, 0.25);
+  background: rgba(176, 42, 42, 0.05);
+  font-size: 14px;
+}
+.danger-box p {
+  margin: 4px 0;
+}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Weights · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Weights</h1>
+    <p class="page-subtitle">Track your weight and body metrics over time.</p>
+  </div>
+  <div class="page-head__right">
+    <a class="btn btn--primary" href="/weights/new">+ Add</a>
+  </div>
+</section>
+
+{% if not profile_complete %}
+<div class="card" style="border-color:rgba(255,140,0,0.4); background:rgba(255,140,0,0.06);">
+  <p style="margin:0; font-size:13px;">
+    <a class="link" href="/profile">Set your age and sex in Profile</a>
+    to enable BMR, Ideal Body Weight, and Body Fat % calculations.
+  </p>
+</div>
+{% endif %}
+
+{% if latest %}
+<section class="card">
+  <div class="card__header">
+    <h2 class="card__title">Latest · {{ latest.date }}</h2>
+    <span class="chip chip--ghost">{{ latest.weight_kg }} kg · {{ latest.height_cm }} cm</span>
+  </div>
+
+  <div class="summary">
+    <div class="summary__item">
+      <span>BMI</span>
+      <strong>{{ latest.bmi if latest.bmi is not none else "—" }}</strong>
+    </div>
+    <div class="summary__item">
+      <span>BMR (kcal)</span>
+      <strong>{{ latest.bmr if latest.bmr is not none else "—" }}</strong>
+    </div>
+    <div class="summary__item">
+      <span>IBW (kg)</span>
+      <strong>{{ latest.ibw if latest.ibw is not none else "—" }}</strong>
+    </div>
+    <div class="summary__item">
+      <span>Body Fat %</span>
+      <strong>{{ latest.body_fat_pct if latest.body_fat_pct is not none else "—" }}</strong>
+    </div>
+  </div>
+
+  {% if latest.bmi %}
+  <div class="bmi-result">
+    <div class="bmi-result__top">
+      <div>
+        <div class="bmi-result__label">BMI</div>
+        <div class="bmi-result__value">{{ latest.bmi }}</div>
+      </div>
+      <div class="bmi-tag bmi-tag--{{ latest.bmi_mod }}">{{ latest.bmi_tag }}</div>
+    </div>
+
+    <div class="bmi-bar" aria-label="BMI scale">
+      <div class="bmi-bar__seg bmi-bar__seg--under"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--normal"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--over"></div>
+      <div class="bmi-bar__seg bmi-bar__seg--obese"></div>
+      {% set pct = [(latest.bmi - 10) / 30 * 100, 100] | min %}
+      {% set pct = [pct, 0] | max %}
+      <div class="bmi-bar__marker" style="left: {{ pct }}%" aria-hidden="true"></div>
+    </div>
+
+    <div class="bmi-legend">
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--under"></span><span>Underweight</span><span class="bmi-range">&lt; 18.5</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--normal"></span><span>Normal</span><span class="bmi-range">18.5 – 24.9</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--over"></span><span>Overweight</span><span class="bmi-range">25.0 – 29.9</span>
+      </div>
+      <div class="bmi-legend__row">
+        <span class="bmi-dot bmi-dot--obese"></span><span>Obese</span><span class="bmi-range">≥ 30.0</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if weights_data %}
+<section class="card">
+  <div class="card__header">
+    <h2 class="card__title">Weight over time</h2>
+    <span class="chip chip--ghost">Last 30 entries</span>
+  </div>
+  <canvas id="weightChart"></canvas>
+</section>
+{% endif %}
+
+<section class="card">
+  <div class="card__header">
+    <h2 class="card__title">History</h2>
+  </div>
+
+  <div class="list" aria-live="polite">
+    {% if entries %}
+      {% for e in entries %}
+      <div class="list__row">
+        <div class="list__main">
+          <div class="list__title">{{ e.weight_kg }} kg · {{ e.height_cm }} cm</div>
+          <div class="list__meta">
+            <span>{{ e.date }}</span>
+            {% if e.bmi %}<span> · BMI {{ e.bmi }}</span>{% endif %}
+            {% if e.bmi_tag %}<span> · <span class="weight-tag weight-tag--{{ e.bmi_mod }}">{{ e.bmi_tag }}</span></span>{% endif %}
+            {% if e.notes %}<span> · {{ e.notes }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="list__actions">
+          <a class="btn btn--ghost" href="/weights/{{ e._id }}/delete">Delete</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="list__empty">No entries yet. Log your first weight.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if weights_data %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.js"></script>
+<script>const weightsData = {{ weights_data | tojson }};</script>
+<script src="{{ url_for('static', filename='javascript/weight_graph.js') }}"></script>
+{% endif %}
+{% endblock %}
