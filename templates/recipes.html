@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Recipes · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Recipes</h1>
+    <p class="page-subtitle">Pick one dish to view ingredients and steps.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="searchbar" method="GET" action="/recipes">
+    <select class="input" name="dish">
+      <option value="beef-bowl" {% if dish == "beef-bowl" %}selected{% endif %}>Beef Bowl</option>
+      <option value="chicken-bowl" {% if dish == "chicken-bowl" %}selected{% endif %}>Chicken Bowl</option>
+      <option value="caesar-salad" {% if dish == "caesar-salad" %}selected{% endif %}>Caesar Salad</option>
+      <option value="mashed-potato" {% if dish == "mashed-potato" %}selected{% endif %}>Mashed Potato</option>
+    </select>
+    <button class="btn btn--ghost" type="submit">Open</button>
+  </form>
+
+  <div class="recipe-head">
+    <h2 class="recipe-title">{{ dish_data.title }}</h2>
+
+    <div class="summary">
+      <div class="summary__item"><span>Calories</span><strong>{{ dish_data.macros.calories }}</strong></div>
+      <div class="summary__item"><span>Protein</span><strong>{{ dish_data.macros.protein }}</strong></div>
+      <div class="summary__item"><span>Carbs</span><strong>{{ dish_data.macros.carbs }}</strong></div>
+      <div class="summary__item"><span>Fats</span><strong>{{ dish_data.macros.fats }}</strong></div>
+    </div>
+  </div>
+
+  <div class="recipe-grid">
+    <div class="recipe-block">
+      <h3 class="recipe-subtitle">Ingredients</h3>
+      <ul class="recipe-list">
+        {% for item in dish_data.ingredients %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="recipe-block">
+      <h3 class="recipe-subtitle">Steps</h3>
+      <ol class="recipe-list">
+        {% for step in dish_data.steps %}
+          <li>{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

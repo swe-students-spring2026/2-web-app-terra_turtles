@@ -21,6 +21,11 @@
     <a class="btn btn--ghost" href="/diet">Clear</a>
   </form>
 
+  <div class="card__header" style="margin-bottom:8px;">
+  <h2 class="card__title">Summary</h2>
+  <span class="chip chip--ghost">{{ active_date }}</span>
+  </div>
+
   <!-- Summary (server-calculated) -->
   <div class="summary">
     <div class="summary__item"><span>Calories</span><strong>{{ totals.calories }}</strong></div>
@@ -28,6 +33,28 @@
     <div class="summary__item"><span>Carbs</span><strong>{{ totals.carbs }}</strong></div>
     <div class="summary__item"><span>Fats</span><strong>{{ totals.fats }}</strong></div>
   </div>
+
+<!-- Target calories calculation-->
+<div class="target-box" data-day-calories="{{ totals.calories }}">
+  <div class="target-box__left">
+    <div class="target-box__title">Daily target</div>
+    <div class="target-box__desc">Compare today's calories with your target.</div>
+  </div>
+
+  <div class="target-box__right">
+    <input
+      class="input target-box__input"
+      id="targetCalories"
+      type="number"
+      min="0"
+      step="1"
+      placeholder="Target"
+    />
+    <button class="btn btn--ghost" type="button" id="targetApply">Apply</button>
+  </div>
+
+  <div class="target-box__msg" id="targetMsg"></div>
+</div>
 
   <!-- Search by meal name -->
   <form class="searchbar" method="GET" action="/diet/search">
@@ -60,8 +87,10 @@
           </div>
 
           <div class="list__actions">
+            <a class="btn btn--ghost" href="/diet/{{ m._id }}/edit">Edit</a>
             <a class="btn btn--ghost" href="/diet/{{ m._id }}/delete">Delete</a>
           </div>
+
         </div>
       {% endfor %}
     {% else %}
@@ -71,4 +100,6 @@
 </section>
 {% endblock %}
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='javascript/diet_target.js') }}"></script>
+{% endblock %}
