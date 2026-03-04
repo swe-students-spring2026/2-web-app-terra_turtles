@@ -611,3 +611,169 @@ body {
   display: flex;
   justify-content: center;
 }
+
+/* quick tool icons design */
+.tool__icon--bmi {
+  background: rgba(255, 210, 0, 0.18);
+  border: 1px solid rgba(255, 210, 0, 0.35);
+}
+.tool__icon--recipes {
+  background: rgba(120, 180, 255, 0.18);
+  border: 1px solid rgba(120, 180, 255, 0.35);
+}
+
+/* diet target calories */
+.target-box {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+.target-box__title {
+  font-weight: 900;
+}
+.target-box__desc {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.target-box__right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.target-box__input {
+  max-width: 160px;
+}
+.target-box__msg {
+  margin-top: 10px;
+  font-weight: 850;
+}
+.target-box__msg--ok {
+  color: #2b7a2b;
+}
+.target-box__msg--over {
+  color: #b02a2a;
+}
+
+/* diet actions, keep buttons on one line */
+.list__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* BMI */
+.bmi-result {
+  margin-top: 12px;
+}
+.bmi-result__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.bmi-result__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.bmi-result__value {
+  font-size: 34px;
+  font-weight: 950;
+  line-height: 1;
+}
+.bmi-tag {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-weight: 900;
+  background: #fff;
+}
+.bmi-tag--under { background: rgba(255, 210, 0, 0.22); }
+.bmi-tag--normal { background: rgba(70, 200, 120, 0.22); }
+.bmi-tag--over { background: rgba(255, 140, 0, 0.22); }
+.bmi-tag--obese { background: rgba(255, 80, 80, 0.22); }
+
+.bmi-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.bmi-bar__seg--under { background: rgba(255, 210, 0, 0.45); }
+.bmi-bar__seg--normal { background: rgba(70, 200, 120, 0.45); }
+.bmi-bar__seg--over { background: rgba(255, 140, 0, 0.45); }
+.bmi-bar__seg--obese { background: rgba(255, 80, 80, 0.45); }
+
+.bmi-bar__marker {
+  position: absolute;
+  top: -6px;
+  width: 10px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  transform: translateX(-50%);
+}
+
+.bmi-legend {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.bmi-legend__row {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.bmi-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+.bmi-dot--under { background: rgba(255, 210, 0, 0.9); }
+.bmi-dot--normal { background: rgba(70, 200, 120, 0.9); }
+.bmi-dot--over { background: rgba(255, 140, 0, 0.9); }
+.bmi-dot--obese { background: rgba(255, 80, 80, 0.9); }
+.bmi-range {
+  color: var(--muted);
+}
+
+/* recipes */
+.recipe-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+.recipe-block {
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.75);
+}
+.recipe-title {
+  margin: 8px 0 0;
+}
+.recipe-subtitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 900;
+}
+.recipe-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 13px;
+}
+.recipe-list li {
+  margin: 6px 0;
+}

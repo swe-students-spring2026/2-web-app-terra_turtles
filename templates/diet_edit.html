@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Edit Meal · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Edit Meal</h1>
+    <p class="page-subtitle">Update calories and macros.</p>
+  </div>
+</section>
+
+<section class="card">
+  <form class="form" method="POST" action="/diet/{{ meal._id }}/edit" autocomplete="off">
+    <label class="label" for="date">Date</label>
+    <input class="input" id="date" name="date" type="date" value="{{ meal.date or '' }}" required />
+
+    <label class="label" for="meal">Meal name</label>
+    <input class="input" id="meal" name="meal" type="text" value="{{ meal.meal or '' }}" required />
+
+    <div class="grid-2">
+      <div>
+        <label class="label" for="calories">Calories</label>
+        <input class="input" id="calories" name="calories" type="number" min="0" step="1" value="{{ meal.calories or 0 }}" required />
+      </div>
+
+      <div>
+        <label class="label" for="protein">Protein (g)</label>
+        <input class="input" id="protein" name="protein" type="number" min="0" step="1" value="{{ meal.protein or 0 }}" />
+      </div>
+
+      <div>
+        <label class="label" for="carbs">Carbs (g)</label>
+        <input class="input" id="carbs" name="carbs" type="number" min="0" step="1" value="{{ meal.carbs or 0 }}" />
+      </div>
+
+      <div>
+        <label class="label" for="fats">Fats (g)</label>
+        <input class="input" id="fats" name="fats" type="number" min="0" step="1" value="{{ meal.fats or 0 }}" />
+      </div>
+    </div>
+
+    <label class="label" for="notes">Notes (optional)</label>
+    <input class="input" id="notes" name="notes" type="text" value="{{ meal.notes or '' }}" />
+
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/diet">Cancel</a>
+      <button class="btn btn--primary" type="submit">Save changes</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

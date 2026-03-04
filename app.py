@@ -370,14 +370,30 @@ def meal_totals(meals):
 @login_required
 def diet():
     date = (request.args.get("date") or "").strip()
-    query = {"user_id": current_user.id}
+    today = datetime.now().date().isoformat()
 
+    # active_date decides summary and target calculations
+    active_date = date if date else today
+
+    # list meals behavior: if date provided, show meals for that date; if no date, show all meals (sorted by date desc)
+    query = {"user_id": current_user.id}
     if date:
         query["date"] = date
 
     meals = list(db["meals"].find(query).sort("_id", -1))
-    totals = meal_totals(meals)
-    return render_template("diet.html", meals=meals, totals=totals, date=date)
+
+    # totals always computed from active_date
+    meals_active = list(db["meals"].find({"user_id": current_user.id, "date": active_date}))
+    totals = meal_totals(meals_active)
+
+    return render_template(
+        "diet.html",
+        meals=meals,
+        totals=totals,
+        date=date,
+        today=today,
+        active_date=active_date
+    )
 
 
 @app.get("/diet/search")
@@ -442,6 +458,134 @@ def diet_delete_post(id):
     db["meals"].delete_one({"_id": _id, "user_id": current_user.id})
     return redirect(url_for("diet"))
 
+@app.get("/diet/<id>/edit")
+@login_required
+def diet_edit(id):
+    _id = to_oid(id)
+    if not _id:
+        return "Invalid meal id", 400
+
+    meal = db["meals"].find_one({"_id": _id, "user_id": current_user.id})
+    if not meal:
+        return "Meal not found", 404
+
+    return render_template("diet_edit.html", meal=meal)
+
+
+@app.post("/diet/<id>/edit")
+@login_required
+def diet_edit_post(id):
+    _id = to_oid(id)
+    if not _id:
+        return "Invalid meal id", 400
+
+    db["meals"].update_one(
+        {"_id": _id, "user_id": current_user.id},
+        {"$set": {
+            "date": request.form.get("date"),
+            "meal": (request.form.get("meal") or "").strip(),
+            "calories": to_int(request.form.get("calories")),
+            "protein": to_int(request.form.get("protein")),
+            "carbs": to_int(request.form.get("carbs")),
+            "fats": to_int(request.form.get("fats")),
+            "notes": (request.form.get("notes") or "").strip(),
+            "updated_at": datetime.utcnow(),
+        }}
+    )
+    return redirect(url_for("diet"))
+
+# BMI
+@app.get("/bmi")
+@login_required
+def bmi():
+    return render_template("bmi.html")
+
+
+# Recipes
+@app.get("/recipes")
+@login_required
+def recipes():
+    dish = (request.args.get("dish") or "beef-bowl").strip()
+
+    recipes_data = {
+        "beef-bowl": {
+            "title": "Beef Bowl",
+            "macros": {"calories": 650, "protein": 42, "carbs": 70, "fats": 22},
+            "ingredients": [
+                "150g lean ground beef",
+                "1 cup cooked rice",
+                "1/2 onion",
+                "1 tbsp soy sauce",
+                "1 tsp sugar",
+                "1 tsp oil",
+                "Salt, black pepper",
+            ],
+            "steps": [
+                "Cook rice and set aside.",
+                "Slice onion. Heat oil on medium heat.",
+                "Cook onion 2–3 minutes until soft.",
+                "Add beef and cook until browned.",
+                "Add soy sauce and sugar, stir 30 seconds.",
+                "Serve over rice.",
+            ],
+        },
+        "chicken-bowl": {
+            "title": "Chicken Bowl",
+            "macros": {"calories": 560, "protein": 48, "carbs": 60, "fats": 14},
+            "ingredients": [
+                "180g chicken breast",
+                "1 cup cooked rice",
+                "1 tbsp soy sauce",
+                "1 tsp oil",
+                "Salt, black pepper",
+            ],
+            "steps": [
+                "Season chicken with salt and pepper.",
+                "Heat oil on medium heat.",
+                "Cook chicken until done, then slice.",
+                "Serve over rice with a light soy drizzle.",
+            ],
+        },
+        "caesar-salad": {
+            "title": "Caesar Salad",
+            "macros": {"calories": 430, "protein": 28, "carbs": 20, "fats": 28},
+            "ingredients": [
+                "2 cups romaine lettuce",
+                "120g cooked chicken",
+                "20g croutons",
+                "2 tbsp Caesar dressing",
+                "Parmesan (optional)",
+            ],
+            "steps": [
+                "Wash and chop romaine.",
+                "Slice chicken.",
+                "Combine lettuce, chicken, and croutons.",
+                "Add dressing and toss.",
+                "Add parmesan if desired.",
+            ],
+        },
+        "mashed-potato": {
+            "title": "Mashed Potato",
+            "macros": {"calories": 380, "protein": 8, "carbs": 55, "fats": 14},
+            "ingredients": [
+                "300g potatoes",
+                "2 tbsp milk",
+                "1 tbsp butter",
+                "Salt, black pepper",
+            ],
+            "steps": [
+                "Peel and cut potatoes.",
+                "Boil until soft, then drain.",
+                "Mash until smooth.",
+                "Mix in butter and milk, season to taste.",
+            ],
+        },
+    }
+
+    if dish not in recipes_data:
+        dish = "beef-bowl"
+
+    return render_template("recipes.html", dish=dish, dish_data=recipes_data[dish])
 
 # Timer
 @app.get("/timer")

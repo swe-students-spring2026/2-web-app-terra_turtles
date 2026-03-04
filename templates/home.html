@@ -1,5 +1,7 @@
-{% extends "base.html" %} {% block title %}Home · FitFlow{% endblock %} {% block
-content %}
+{% extends "base.html" %}
+{% block title %}Home · FitFlow{% endblock %}
+
+{% block content %}
 <section class="hero">
   <div class="hero__bg"></div>
   <div class="hero__content">
@@ -55,24 +57,22 @@ content %}
     </div>
 
     <div class="list">
-      {% if recent_workouts %} {% for w in recent_workouts %}
-      <a
-        class="list__row"
-        href="/workouts"
-        style="text-decoration: none; color: inherit"
-      >
-        <div class="list__main">
-          <div class="list__title">{{ w.exercise }}</div>
-          <div class="list__meta">
-            <span>{{ w.date or "" }}</span>
-            <span> · </span>
-            <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
+      {% if recent_workouts %}
+        {% for w in recent_workouts %}
+        <a class="list__row" href="/workouts" style="text-decoration:none; color:inherit;">
+          <div class="list__main">
+            <div class="list__title">{{ w.exercise }}</div>
+            <div class="list__meta">
+              <span>{{ w.date or "" }}</span>
+              <span> · </span>
+              <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
+            </div>
           </div>
-        </div>
-        <div class="list__right">›</div>
-      </a>
-      {% endfor %} {% else %}
-      <div class="list__empty">No workouts yet. Log your first set.</div>
+          <div class="list__right">›</div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="list__empty">No workouts yet. Log your first set.</div>
       {% endif %}
     </div>
 
@@ -97,30 +97,30 @@ content %}
     </div>
 
     <div class="tool-row">
-      <a class="tool" href="/workouts/search">
-        <div class="tool__icon">🔎</div>
+      <a class="tool" href="/bmi">
+        <div class="tool__icon tool__icon--bmi"></div>
         <div class="tool__text">
-          <div class="tool__title">Search lifts</div>
-          <div class="tool__desc">Find exercise history fast</div>
+          <div class="tool__title">BMI calculator</div>
+          <div class="tool__desc">Check weight status quickly</div>
         </div>
       </a>
 
-      <a class="tool" href="/workouts/new">
-        <div class="tool__icon">➕</div>
+      <a class="tool" href="/recipes">
+        <div class="tool__icon tool__icon--recipes"></div>
         <div class="tool__text">
-          <div class="tool__title">Log a set</div>
-          <div class="tool__desc">Quickly add a workout entry</div>
+          <div class="tool__title">Recipes</div>
+          <div class="tool__desc">Simple meals</div>
         </div>
       </a>
     </div>
   </article>
 </section>
-{% endblock %} {% block scripts %}
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.js"></script>
-
 <script>
-  const caloriesData = {{calories_data | tojson }};
+  const caloriesData = {{ calories_data | tojson }};
 </script>
-
-<script src="{{url_for('static', filename='javascript/graph.js')}}"></script>
+<script src="{{ url_for('static', filename='javascript/graph.js') }}"></script>
 {% endblock %}
