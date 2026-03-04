@@ -109,7 +109,7 @@ http://127.0.0.1:5000/
 ```
 
 
-## windows (PowerShell)
+## Windows (PowerShell)
 ### 1) Clone the repo
 ```bash
 git clone https://github.com/swe-students-spring2026/2-web-app-terra_turtles.git
