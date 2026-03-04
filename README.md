@@ -88,9 +88,9 @@ cp env.example .env
 ```
 Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
-### 3) Install dependencies
+### 3) Install pipenv
 ```bash
-pipenv install
+pip install pipenv
 ```
 
 ### 4) Create and activate a virtual environment
@@ -98,13 +98,20 @@ pipenv install
 pipenv shell
 ```
 
-### 5) Run the Flask app
+### 5) Install dependencies
+```bash
+pipenv install
+```
+
+### 6) Run the Flask app
 ```bash
 pipenv run python3 app.py
 ```
 
-### 6) Open in browser
-```bash
+### 7) Open in browser
+
+Go to:
+```
 http://127.0.0.1:5000/
 ```
 
@@ -121,21 +128,28 @@ copy env.example .env
 ```
 Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
 
-### 3) Install dependencies
+### 3) Install pipenv
 ```bash
-pipenv install
+pip install pipenv
 ```
 
 ### 4) Create and activate a virtual environment
 ```bash
 pipenv shell
 ```
-### 5) Run the Flask app
+
+### 5) Install dependencies
+```bash
+pipenv install
+```
+### 6) Run the Flask app
 ```bash
 pipenv run python app.py
 ```
-### 6) Open in browser
-```bash
+### 7) Open in browser
+
+Go to:
+```
 http://127.0.0.1:5000/
 ```
 
@@ -147,9 +161,15 @@ git clone https://github.com/swe-students-spring2026/2-web-app-terra_turtles.git
 cd 2-web-app-terra_turtles
 ```
 
-### 3) Install dependencies
+### 2) Create .env
 ```bash
-pipenv install
+copy env.example .env
+```
+Then open the .env file and fill in the MONGO_URI and SECRET_KEY fields.
+
+### 3) Install pipenv
+```bash
+pip install pipenv
 ```
 
 ### 4) Create and activate a virtual environment
@@ -157,13 +177,20 @@ pipenv install
 pipenv shell
 ```
 
-### 5) Run the Flask app
+### 5) Install dependencies
+```bash
+pipenv install
+```
+
+### 6) Run the Flask app
 ```bash
 pipenv run python app.py
 ```
 
-### 6) Open in browser
-```bash
+### 7) Open in browser
+
+Go to:
+```
 http://127.0.0.1:5000/
 ```
 
