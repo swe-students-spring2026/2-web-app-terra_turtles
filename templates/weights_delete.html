@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Delete Entry · FitFlow{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="page-head__left">
+    <h1 class="page-title">Delete Entry</h1>
+    <p class="page-subtitle">This action cannot be undone.</p>
+  </div>
+</section>
+
+<section class="card">
+  <div class="danger-box">
+    <p><strong>{{ entry.weight_kg }} kg · {{ entry.height_cm }} cm</strong></p>
+    <p>{{ entry.date }}</p>
+    {% if entry.notes %}<p>{{ entry.notes }}</p>{% endif %}
+  </div>
+
+  <form method="POST" action="/weights/{{ entry._id }}/delete" style="margin-top:12px;">
+    <div class="form-actions">
+      <a class="btn btn--ghost" href="/weights">Cancel</a>
+      <button class="btn btn--primary" type="submit">Delete</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

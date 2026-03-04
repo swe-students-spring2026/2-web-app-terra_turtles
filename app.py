@@ -35,6 +35,8 @@ class User(UserMixin):
         self.id = str(user_doc["_id"])
         self.name = user_doc.get("name", "")
         self.email = user_doc.get("email", "")
+        self.sex = user_doc.get("sex", None)
+        self.age = user_doc.get("age", None)
 
 
 @login_manager.user_loader
@@ -65,6 +67,52 @@ def to_oid(value):
         return ObjectId(value)
     except Exception:
         return None
+
+
+def compute_weight_metrics(weight_kg, height_cm, age, sex):
+    if not all([weight_kg, height_cm, age, sex]):
+        return {"bmi": None, "bmr": None, "ibw": None, "body_fat_pct": None}
+    height_m = height_cm / 100.0
+    bmi = round(weight_kg / (height_m ** 2), 1)
+    if sex == "male":
+        bmr = round(10 * weight_kg + 6.25 * height_cm - 5 * age + 5)
+    else:
+        bmr = round(10 * weight_kg + 6.25 * height_cm - 5 * age - 161)
+    height_in = height_cm / 2.54
+    if height_in >= 60:
+        ibw = round(50 + 2.3 * (height_in - 60), 1) if sex == "male" else round(45.5 + 2.3 * (height_in - 60), 1)
+    else:
+        ibw = None
+    if sex == "male":
+        body_fat_pct = round(1.20 * bmi + 0.23 * age - 16.2, 1)
+    else:
+        body_fat_pct = round(1.20 * bmi + 0.23 * age - 5.4, 1)
+    body_fat_pct = max(0.0, body_fat_pct)
+    return {"bmi": bmi, "bmr": int(bmr), "ibw": ibw, "body_fat_pct": body_fat_pct}
+
+
+def bmi_tag(bmi):
+    if bmi is None:
+        return ""
+    if bmi < 18.5:
+        return "Underweight"
+    elif bmi < 25.0:
+        return "Normal"
+    elif bmi < 30.0:
+        return "Overweight"
+    return "Obese"
+
+
+def bmi_css_modifier(bmi):
+    if bmi is None:
+        return ""
+    if bmi < 18.5:
+        return "under"
+    elif bmi < 25.0:
+        return "normal"
+    elif bmi < 30.0:
+        return "over"
+    return "obese"
 
 
 def require_login():
@@ -249,6 +297,33 @@ def reset_password_post(token):
     )
 
     return redirect(url_for("login"))
+
+
+# Profile
+@app.get("/profile")
+@login_required
+def profile():
+    user_doc = db["users"].find_one({"_id": to_oid(current_user.id)})
+    return render_template("profile.html", user=user_doc)
+
+
+@app.post("/profile")
+@login_required
+def profile_post():
+    age = to_int(request.form.get("age"))
+    sex = (request.form.get("sex") or "").strip().lower()
+    user_doc = db["users"].find_one({"_id": to_oid(current_user.id)})
+
+    if sex not in ("male", "female"):
+        return render_template("profile.html", user=user_doc, error="Please select a valid sex.")
+    if not (1 <= age <= 120):
+        return render_template("profile.html", user=user_doc, error="Please enter a valid age (1–120).")
+
+    db["users"].update_one(
+        {"_id": to_oid(current_user.id)},
+        {"$set": {"age": age, "sex": sex, "updated_at": datetime.utcnow()}}
+    )
+    return redirect(url_for("profile"))
 
 
 # Workouts (sets)
@@ -493,6 +568,89 @@ def diet_edit_post(id):
         }}
     )
     return redirect(url_for("diet"))
+
+# Weights
+@app.get("/weights")
+@login_required
+def weights():
+    uid = current_user.id
+    age = current_user.age
+    sex = current_user.sex
+
+    entries = list(db["weights"].find({"user_id": uid}).sort("created_at", -1).limit(50))
+    for e in entries:
+        metrics = compute_weight_metrics(e.get("weight_kg"), e.get("height_cm"), age, sex)
+        e["bmi"] = metrics["bmi"]
+        e["bmr"] = metrics["bmr"]
+        e["ibw"] = metrics["ibw"]
+        e["body_fat_pct"] = metrics["body_fat_pct"]
+        e["bmi_tag"] = bmi_tag(metrics["bmi"])
+        e["bmi_mod"] = bmi_css_modifier(metrics["bmi"])
+
+    latest = entries[0] if entries else None
+
+    chart_entries = list(db["weights"].find({"user_id": uid}).sort("created_at", 1).limit(30))
+    weights_data = [{"date": e["date"], "weight": e["weight_kg"]} for e in chart_entries]
+
+    profile_complete = bool(age and sex)
+    return render_template("weights.html", entries=entries, latest=latest,
+                           weights_data=weights_data, profile_complete=profile_complete)
+
+
+@app.get("/weights/new")
+@login_required
+def weights_new():
+    today = datetime.now().date().isoformat()
+    profile_complete = bool(current_user.age and current_user.sex)
+    return render_template("weights_new.html", today=today, profile_complete=profile_complete)
+
+
+@app.post("/weights/new")
+@login_required
+def weights_new_post():
+    weight_kg = to_float(request.form.get("weight_kg"))
+    height_cm = to_float(request.form.get("height_cm"))
+    date = request.form.get("date") or datetime.now().date().isoformat()
+    notes = (request.form.get("notes") or "").strip()
+
+    if not weight_kg or not height_cm:
+        today = datetime.now().date().isoformat()
+        return render_template("weights_new.html", today=today,
+                               profile_complete=bool(current_user.age and current_user.sex),
+                               error="Weight and height are required.")
+
+    db["weights"].insert_one({
+        "user_id": current_user.id,
+        "date": date,
+        "weight_kg": weight_kg,
+        "height_cm": height_cm,
+        "notes": notes,
+        "created_at": datetime.utcnow(),
+    })
+    return redirect(url_for("weights"))
+
+
+@app.get("/weights/<id>/delete")
+@login_required
+def weights_delete(id):
+    _id = to_oid(id)
+    if not _id:
+        return "Invalid entry id", 400
+    entry = db["weights"].find_one({"_id": _id, "user_id": current_user.id})
+    if not entry:
+        return "Entry not found", 404
+    return render_template("weights_delete.html", entry=entry)
+
+
+@app.post("/weights/<id>/delete")
+@login_required
+def weights_delete_post(id):
+    _id = to_oid(id)
+    if not _id:
+        return "Invalid entry id", 400
+    db["weights"].delete_one({"_id": _id, "user_id": current_user.id})
+    return redirect(url_for("weights"))
+
 
 # BMI
 @app.get("/bmi")
