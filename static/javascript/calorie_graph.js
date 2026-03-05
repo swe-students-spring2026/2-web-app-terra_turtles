@@ -1,4 +1,4 @@
-/* graph.js
+/* calorie_graph.js
  */
 (async function () {
   new Chart(document.getElementById("calories"), {
