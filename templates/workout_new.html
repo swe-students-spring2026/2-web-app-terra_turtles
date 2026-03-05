@@ -13,7 +13,7 @@
 <section class="card">
   <form class="form" method="POST" action="/workouts/new" autocomplete="off">
     <label class="label" for="date">Date</label>
-    <input class="input" id="date" name="date" type="date" required />
+    <input class="input" id="date" name="date" type="date" value="{{ today }}" required />
 
     <label class="label" for="exercise">Exercise</label>
     <input class="input" id="exercise" name="exercise" type="text" placeholder="e.g., Bench Press" required />

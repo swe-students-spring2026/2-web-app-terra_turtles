@@ -14,7 +14,14 @@
 </section>
 
 <section class="card">
-  <form class="searchbar" method="GET" action="/workouts/search">
+  <form class="searchbar" method="GET" action="/workouts">
+    <input
+      class="input"
+      type="date"
+      name="date"
+      value="{{ active_date or today }}"
+      required
+    />
     <input
       class="input"
       type="search"
@@ -24,7 +31,7 @@
       autocomplete="off"
     />
     <button class="btn btn--ghost" type="submit">Search</button>
-    <a class="btn btn--ghost" href="/workouts">Clear</a>
+    <a class="btn btn--ghost" href="/workouts?date={{ today }}">Today</a>
   </form>
 
   <div class="list" aria-live="polite">

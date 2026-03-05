@@ -42,6 +42,9 @@ body {
       transparent 55%
     ),
     var(--bg);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 1400px 700px, 1400px 700px, auto;
 }
 
 /* Layout */
@@ -656,6 +659,33 @@ body {
 }
 .target-box__msg--over {
   color: #b02a2a;
+}
+
+/* Goal progress */
+.goal-list {
+  display: grid;
+  gap: 10px;
+}
+.goal-row__label {
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+.goal-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.goal-progress__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #6f2dbd, #9d4edd);
+}
+.goal-progress__fill--ok {
+  background: linear-gradient(90deg, #1b9c57, #2ccf7a);
+}
+.goal-progress__fill--warn {
+  background: linear-gradient(90deg, #f08c00, #ff922b);
 }
 
 /* diet actions, keep buttons on one line */
