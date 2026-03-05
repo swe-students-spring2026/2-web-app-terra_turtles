@@ -1,7 +1,10 @@
 /* calorie_graph.js
  */
 (async function () {
-  new Chart(document.getElementById("calories"), {
+  const canvas = document.getElementById("calories");
+  if (!canvas) return;
+
+  new Chart(canvas, {
     type: "line",
     data: {
       labels: caloriesData.map((item) => {
