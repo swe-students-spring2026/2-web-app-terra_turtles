@@ -728,7 +728,7 @@ def goals_post():
         },
         upsert=True,
     )
-    return redirect(url_for("goals"))
+    return redirect(url_for("home"))
 
 
 # BMI

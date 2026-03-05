@@ -34,28 +34,6 @@
     <div class="summary__item"><span>Fats</span><strong>{{ totals.fats }}</strong></div>
   </div>
 
-<!-- Target calories calculation-->
-<div class="target-box" data-day-calories="{{ totals.calories }}">
-  <div class="target-box__left">
-    <div class="target-box__title">Daily target</div>
-    <div class="target-box__desc">Compare today's calories with your target.</div>
-  </div>
-
-  <div class="target-box__right">
-    <input
-      class="input target-box__input"
-      id="targetCalories"
-      type="number"
-      min="0"
-      step="1"
-      placeholder="Target"
-    />
-    <button class="btn btn--ghost" type="button" id="targetApply">Apply</button>
-  </div>
-
-  <div class="target-box__msg" id="targetMsg"></div>
-</div>
-
   <!-- Search by meal name -->
   <form class="searchbar" method="GET" action="/diet/search">
     <input
@@ -98,8 +76,4 @@
     {% endif %}
   </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='javascript/diet_target.js') }}"></script>
 {% endblock %}
