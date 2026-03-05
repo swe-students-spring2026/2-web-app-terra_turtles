@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Home · FitFlow{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Home · FitFlow{% endblock %} {% block
+content %}
 <section class="hero">
   <div class="hero__bg"></div>
   <div class="hero__content">
@@ -58,16 +56,37 @@
 
     <div class="goal-list">
       <div class="goal-row">
-        <div class="goal-row__label">Workouts: {{ today_workouts }} / {{ goals.workouts_per_day }}</div>
-        <div class="goal-progress"><div class="goal-progress__fill" style="width: {{ goals_progress.workouts_pct or 0 }}%"></div></div>
+        <div class="goal-row__label">
+          Workouts: {{ today_workouts }} / {{ goals.workouts_per_day }}
+        </div>
+        <div class="goal-progress">
+          <div
+            class="goal-progress__fill"
+            style="width: {{ goals_progress.workouts_pct or 0 }}%"
+          ></div>
+        </div>
       </div>
       <div class="goal-row">
-        <div class="goal-row__label">Calories: {{ today_calories }} / {{ goals.calories_per_day }}</div>
-        <div class="goal-progress"><div class="goal-progress__fill {% if goals_progress.calories_over %}goal-progress__fill--warn{% endif %}" style="width: {{ goals_progress.calories_pct or 0 }}%"></div></div>
+        <div class="goal-row__label">
+          Calories: {{ today_calories }} / {{ goals.calories_per_day }}
+        </div>
+        <div class="goal-progress">
+          <div
+            class="goal-progress__fill {% if goals_progress.calories_over %}goal-progress__fill--warn{% endif %}"
+            style="width: {{ goals_progress.calories_pct or 0 }}%"
+          ></div>
+        </div>
       </div>
       <div class="goal-row">
-        <div class="goal-row__label">Protein: {{ today_protein }} / {{ goals.protein_g_per_day }} g</div>
-        <div class="goal-progress"><div class="goal-progress__fill goal-progress__fill--ok" style="width: {{ goals_progress.protein_pct or 0 }}%"></div></div>
+        <div class="goal-row__label">
+          Protein: {{ today_protein }} / {{ goals.protein_g_per_day }} g
+        </div>
+        <div class="goal-progress">
+          <div
+            class="goal-progress__fill goal-progress__fill--ok"
+            style="width: {{ goals_progress.protein_pct or 0 }}%"
+          ></div>
+        </div>
       </div>
     </div>
 
@@ -80,7 +99,9 @@
     <div class="card__header">
       <h2 class="card__title">Daily Goals</h2>
     </div>
-    <p class="list__empty">Set your first goals for workouts, calories, and protein.</p>
+    <p class="list__empty">
+      Set your first goals for workouts, calories, and protein.
+    </p>
     <div class="card__footer">
       <a class="btn btn--ghost" href="/goals">Set goals</a>
     </div>
@@ -95,22 +116,24 @@
     </div>
 
     <div class="list">
-      {% if recent_workouts %}
-        {% for w in recent_workouts %}
-        <a class="list__row" href="/workouts" style="text-decoration:none; color:inherit;">
-          <div class="list__main">
-            <div class="list__title">{{ w.exercise }}</div>
-            <div class="list__meta">
-              <span>{{ w.date or "" }}</span>
-              <span> · </span>
-              <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
-            </div>
+      {% if recent_workouts %} {% for w in recent_workouts %}
+      <a
+        class="list__row"
+        href="/workouts"
+        style="text-decoration: none; color: inherit"
+      >
+        <div class="list__main">
+          <div class="list__title">{{ w.exercise }}</div>
+          <div class="list__meta">
+            <span>{{ w.date or "" }}</span>
+            <span> · </span>
+            <span>{{ w.sets }} sets × {{ w.reps }} reps @ {{ w.weight }}</span>
           </div>
-          <div class="list__right">›</div>
-        </a>
-        {% endfor %}
-      {% else %}
-        <div class="list__empty">No workouts yet. Log your first set.</div>
+        </div>
+        <div class="list__right">›</div>
+      </a>
+      {% endfor %} {% else %}
+      <div class="list__empty">No workouts yet. Log your first set.</div>
       {% endif %}
     </div>
 
@@ -123,9 +146,14 @@
   <!-- Calories Visualization -->
   <article class="card">
     <div class="card__header">
-      <h2 class="card__title">Calories (Last 30 Days)</h2>
+      <h2 class="card__title">Calories</h2>
+      <span class="chip chip--ghost">Last 30 entries</span>
     </div>
+    {% if calories_data and calories_data|length > 0 %}
     <canvas id="calories"></canvas>
+    {% else %}
+    <p class="list__empty">No data yet. Log a meal to see your progress!</p>
+    {% endif %}
   </article>
 
   <!-- Shortcuts -->
@@ -161,12 +189,10 @@
     </div>
   </article>
 </section>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.js"></script>
 <script>
   const caloriesData = {{ calories_data | tojson }};
 </script>
-<script src="{{ url_for('static', filename='javascript/graph.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/calorie_graph.js') }}"></script>
 {% endblock %}
